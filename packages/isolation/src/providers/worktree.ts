@@ -206,22 +206,20 @@ export class WorktreeProvider implements IIsolationProvider {
       result.directoryClean = true;
     }
 
-    // Get canonical repo path - use provided path or derive from worktree
-    let repoPath: string;
-    if (options?.canonicalRepoPath) {
-      repoPath = options.canonicalRepoPath;
-    } else if (pathExists) {
-      repoPath = await getCanonicalRepoPath(worktreePath);
-    } else {
-      // Path doesn't exist and no canonicalRepoPath provided - can't clean up branch
-      // This is expected when worktree was already fully cleaned up externally
+    // Path doesn't exist and no canonicalRepoPath provided - can't clean up branch
+    // This is expected when worktree was already fully cleaned up externally
+    if (!pathExists && !options?.canonicalRepoPath) {
       if (options?.branchName) {
-        const warning = `Cannot delete branch '${options.branchName}': worktree path gone and no canonicalRepoPath provided`;
+        result.warnings.push(
+          `Cannot delete branch '${options.branchName}': worktree path gone and no canonicalRepoPath provided`
+        );
         getLog().warn({ worktreePath, branchName: options.branchName }, 'branch_cleanup_skipped');
-        result.warnings.push(warning);
       }
       return result;
     }
+
+    const repoPath: string =
+      options?.canonicalRepoPath ?? (await getCanonicalRepoPath(worktreePath));
 
     // Only attempt worktree removal if path exists
     if (pathExists) {
