@@ -601,21 +601,23 @@ function buildFullPrompt(
           .join('\n')
       : '';
 
-  const workflowContextPrefix = workflowContext ? '\n\n---\n\n' + workflowContext : '';
-  const messageSuffix = contextSuffix + fileSuffix;
+  const workflowContextSuffix = workflowContext ? '\n\n---\n\n' + workflowContext : '';
 
   if (threadContext) {
     return (
       '## Thread Context (previous messages)\n\n' +
       threadContext +
-      workflowContextPrefix +
+      workflowContextSuffix +
       '\n\n---\n\n## Current Request\n\n' +
       message +
-      messageSuffix
+      contextSuffix +
+      fileSuffix
     );
   }
 
-  return workflowContextPrefix + '\n\n---\n\n## User Message\n\n' + message + messageSuffix;
+  return (
+    workflowContextSuffix + '\n\n---\n\n## User Message\n\n' + message + contextSuffix + fileSuffix
+  );
 }
 
 // ─── Main Handler ───────────────────────────────────────────────────────────
@@ -793,26 +795,28 @@ export async function handleMessage(
       ];
 
       if (deterministicCommands.includes(command)) {
-        getLog().debug({ command, conversationId }, 'deterministic_command');
-
         if (command === 'register-project') {
-          const result = await handleRegisterProject(message);
+          getLog().debug({ command, conversationId }, 'deterministic_command');
+          const result = await handleRegisterProject(message, platform, conversationId);
           await platform.sendMessage(conversationId, result);
           return;
         }
 
         if (command === 'update-project') {
+          getLog().debug({ command, conversationId }, 'deterministic_command');
           const result = await handleUpdateProject(message);
           await platform.sendMessage(conversationId, result);
           return;
         }
 
         if (command === 'remove-project') {
+          getLog().debug({ command, conversationId }, 'deterministic_command');
           const result = await handleRemoveProject(message);
           await platform.sendMessage(conversationId, result);
           return;
         }
 
+        getLog().debug({ command, conversationId }, 'deterministic_command');
         const result = await commandHandler.handleCommand(conversation, message);
         await platform.sendMessage(conversationId, result.message);
 
@@ -1525,7 +1529,11 @@ async function handleProjectRegistrationResult(
   }
 
   // Register the project
-  const regResult = await handleRegisterProject(`/register-project ${projectName} ${projectPath}`);
+  const regResult = await handleRegisterProject(
+    `/register-project ${projectName} ${projectPath}`,
+    platform,
+    conversationId
+  );
   await platform.sendMessage(conversationId, regResult);
 }
 
@@ -1535,7 +1543,11 @@ async function handleProjectRegistrationResult(
  * Handle /register-project command.
  * Creates a codebase DB entry for a cloned project.
  */
-async function handleRegisterProject(message: string): Promise<string> {
+async function handleRegisterProject(
+  message: string,
+  _platform: IPlatformAdapter,
+  _conversationId: string
+): Promise<string> {
   const { args } = commandHandler.parseCommand(message);
   if (args.length < 2) {
     return 'Usage: /register-project <name> <path>';

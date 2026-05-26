@@ -107,6 +107,9 @@ describe('WorktreeProvider', () => {
     getCanonicalRepoPathSpy.mockRestore();
     getDefaultBranchSpy.mockRestore();
     syncWorkspaceSpy.mockRestore();
+    mockAccess.mockClear();
+    mockReadFile.mockClear();
+    mockRm.mockClear();
   });
 
   describe('generateBranchName', () => {

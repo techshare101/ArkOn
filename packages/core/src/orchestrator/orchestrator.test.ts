@@ -265,43 +265,42 @@ const mockClient = {
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
 function clearAllMocks(): void {
-  for (const fn of Object.values(mockLogger)) {
-    if (typeof fn === 'function' && 'mockClear' in fn) fn.mockClear();
-  }
+  mockLogger.fatal.mockClear();
+  mockLogger.error.mockClear();
+  mockLogger.warn.mockClear();
+  mockLogger.info.mockClear();
+  mockLogger.debug.mockClear();
+  mockLogger.trace.mockClear();
 
-  for (const m of [
-    mockGetOrCreateConversation,
-    mockGetConversationByPlatformId,
-    mockUpdateConversation,
-    mockTouchConversation,
-    mockGetCodebase,
-    mockListCodebases,
-    mockCreateCodebase,
-    mockGetActiveSession,
-    mockCreateSession,
-    mockUpdateSession,
-    mockDeactivateSession,
-    mockTransitionSession,
-    mockHandleCommand,
-    mockParseCommand,
-    mockGetAgentProvider,
-    mockDiscoverWorkflows,
-    mockExecuteWorkflow,
-    mockFindWorkflow,
-    mockSyncArchonToWorktree,
-    mockValidateAndResolveIsolation,
-    mockDispatchBackgroundWorkflow,
-    mockBuildOrchestratorPrompt,
-    mockBuildProjectScopedPrompt,
-    mockBuildOrchestratorSystemAppend,
-    mockLoadConfig,
-    mockExistsSync,
-    mockGenerateAndSetTitle,
-    mockClient.sendQuery,
-    mockClient.getType,
-  ]) {
-    m.mockClear();
-  }
+  mockGetOrCreateConversation.mockClear();
+  mockGetConversationByPlatformId.mockClear();
+  mockUpdateConversation.mockClear();
+  mockTouchConversation.mockClear();
+  mockGetCodebase.mockClear();
+  mockListCodebases.mockClear();
+  mockCreateCodebase.mockClear();
+  mockGetActiveSession.mockClear();
+  mockCreateSession.mockClear();
+  mockUpdateSession.mockClear();
+  mockDeactivateSession.mockClear();
+  mockTransitionSession.mockClear();
+  mockHandleCommand.mockClear();
+  mockParseCommand.mockClear();
+  mockGetAgentProvider.mockClear();
+  mockDiscoverWorkflows.mockClear();
+  mockExecuteWorkflow.mockClear();
+  mockFindWorkflow.mockClear();
+  mockSyncArchonToWorktree.mockClear();
+  mockValidateAndResolveIsolation.mockClear();
+  mockDispatchBackgroundWorkflow.mockClear();
+  mockBuildOrchestratorPrompt.mockClear();
+  mockBuildProjectScopedPrompt.mockClear();
+  mockBuildOrchestratorSystemAppend.mockClear();
+  mockLoadConfig.mockClear();
+  mockExistsSync.mockClear();
+  mockGenerateAndSetTitle.mockClear();
+  mockClient.sendQuery.mockClear();
+  mockClient.getType.mockClear();
 }
 
 // ─── Tests ──────────────────────────────────────────────────────────────────

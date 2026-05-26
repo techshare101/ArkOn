@@ -13,7 +13,7 @@ import { createLogger } from '@archon/paths';
 
 /** Best-effort ROLLBACK — log but swallow errors since we're already in an error path. */
 function rollback(): Promise<void> {
-  return pool.query('ROLLBACK').then(
+  return pool.query('ROLLBACK', []).then(
     () => undefined,
     rollbackErr => {
       getLog().warn({ err: rollbackErr as Error }, 'db.rollback_failed');
@@ -319,7 +319,7 @@ export async function findResumableRun(
          )
        ORDER BY started_at DESC
        LIMIT 1`,
-      [workflowName, workingPath]
+      [workflowName, workingPath, 1]
     );
     const row = result.rows[0];
     return row ? normalizeWorkflowRun(row) : null;
@@ -951,7 +951,7 @@ export async function deleteOldWorkflowRuns(olderThanDays: number): Promise<{ co
       ? `NOW() - INTERVAL '${String(olderThanDays)} days'`
       : `datetime('now', '-${String(olderThanDays)} days')`;
   try {
-    await pool.query('BEGIN');
+    await pool.query('BEGIN', []);
     // Delete events first (FK reference)
     await pool.query(
       `DELETE FROM remote_agent_workflow_events WHERE workflow_run_id IN (
@@ -967,7 +967,7 @@ export async function deleteOldWorkflowRuns(olderThanDays: number): Promise<{ co
          AND started_at < ${cutoff}`,
       []
     );
-    await pool.query('COMMIT');
+    await pool.query('COMMIT', []);
     return { count: result.rowCount ?? 0 };
   } catch (error) {
     await rollback();
@@ -983,7 +983,7 @@ export async function deleteOldWorkflowRuns(olderThanDays: number): Promise<{ co
  */
 export async function deleteWorkflowRun(id: string): Promise<void> {
   try {
-    await pool.query('BEGIN');
+    await pool.query('BEGIN', []);
     // Guard: verify run exists and is terminal before deleting
     const check = await pool.query<{ status: string }>(
       'SELECT status FROM remote_agent_workflow_runs WHERE id = $1',
@@ -999,7 +999,7 @@ export async function deleteWorkflowRun(id: string): Promise<void> {
     }
     await pool.query('DELETE FROM remote_agent_workflow_events WHERE workflow_run_id = $1', [id]);
     await pool.query('DELETE FROM remote_agent_workflow_runs WHERE id = $1', [id]);
-    await pool.query('COMMIT');
+    await pool.query('COMMIT', []);
   } catch (error) {
     await rollback();
     if (error instanceof WorkflowRunGuardError) throw error;
