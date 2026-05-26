@@ -693,6 +693,19 @@ describe('WorktreeProvider', () => {
         ]),
         expect.any(Object)
       );
+
+      // --no-track must NOT be in the fallback call (only applies to new-branch -b creation)
+      const fallbackWorktreeAdd = execSpy.mock.calls.filter((call: unknown[]) => {
+        const args = call[1] as string[];
+        return (
+          args.includes('worktree') &&
+          args.includes('add') &&
+          !args.includes('-b') &&
+          args.includes('archon/issue-42')
+        );
+      });
+      expect(fallbackWorktreeAdd).toHaveLength(1);
+      expect(fallbackWorktreeAdd[0][1]).not.toContain('--no-track');
     });
 
     test('propagates error if branch -f reset fails (protected branch, etc.)', async () => {
