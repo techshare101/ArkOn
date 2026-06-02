@@ -447,6 +447,33 @@ describe('ClaudeProvider', () => {
       });
     });
 
+    test('result chunk carries resumed:true when resumeSessionId provided (resume-or-error)', async () => {
+      mockQuery.mockImplementation(async function* () {
+        yield { type: 'result', session_id: 'resumed-sid' };
+      });
+
+      const chunks = [];
+      for await (const chunk of client.sendQuery('prompt', '/workspace', 'session-to-resume')) {
+        chunks.push(chunk);
+      }
+
+      expect(chunks.find(c => c.type === 'result')).toMatchObject({ resumed: true });
+    });
+
+    test('result chunk omits resumed when no resumeSessionId', async () => {
+      mockQuery.mockImplementation(async function* () {
+        yield { type: 'result', session_id: 'fresh-sid' };
+      });
+
+      const chunks = [];
+      for await (const chunk of client.sendQuery('prompt', '/workspace')) {
+        chunks.push(chunk);
+      }
+
+      const result = chunks.find(c => c.type === 'result') as { resumed?: boolean } | undefined;
+      expect(result?.resumed).toBeUndefined();
+    });
+
     test('handles tool_use with empty input', async () => {
       mockQuery.mockImplementation(async function* () {
         yield {

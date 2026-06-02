@@ -14,7 +14,7 @@ import type {
 import { PI_CAPABILITIES } from './capabilities';
 import { parsePiConfig } from './config';
 import { parsePiModelRef } from './model-ref';
-import { withResumedOutcome } from '../../shared/resumed';
+import { withResumedOutcome, resumedOutcome } from '../../shared/resumed';
 
 // IMPORTANT: Do NOT add static `import { ... } from '@earendil-works/*'` here,
 // and do NOT statically import sibling modules that themselves import runtime
@@ -587,7 +587,7 @@ export class PiProvider implements IAgentProvider {
           outputFormat?.schema,
           uiBridge
         ),
-        resumeSessionId !== undefined ? !resumeFailed : undefined
+        resumedOutcome(resumeSessionId, !resumeFailed)
       );
       getLog().info({ piProvider: parsed.provider }, 'pi.prompt_completed');
     } catch (err) {

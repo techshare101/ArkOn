@@ -205,9 +205,9 @@ export type MessageChunk =
        * instead of silently continuing with a fresh (cold) session:
        *   - `true`   a resume was requested and the prior session was restored
        *   - `false`  a resume was requested but the provider fell back to fresh
-       *   - omitted  no resume was requested, or the provider can't determine it
+       *   - omitted  no resume was requested
        * Set only when `resumeSessionId` was passed. Consumers (the dag-executor)
-       * use `false` to surface a warning / replay rather than swallow the loss.
+       * use `false` to surface a warning rather than swallow the loss.
        */
       resumed?: boolean;
     }

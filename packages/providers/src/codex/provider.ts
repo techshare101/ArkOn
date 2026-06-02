@@ -22,7 +22,7 @@ import { CODEX_CAPABILITIES } from './capabilities';
 import { resolveCodexBinaryPath } from './binary-resolver';
 import { createLogger } from '@archon/paths';
 import { loadMcpConfig } from '../mcp/config';
-import { withResumedOutcome } from '../shared/resumed';
+import { withResumedOutcome, resumedOutcome } from '../shared/resumed';
 
 /** Lazy-initialized logger (deferred so test mocks can intercept createLogger) */
 let cachedLog: ReturnType<typeof createLogger> | undefined;
@@ -841,7 +841,7 @@ export class CodexProvider implements IAgentProvider {
               attemptController.signal,
               Boolean(requestOptions?.nodeConfig?.mcp)
             ),
-            resumeSessionId !== undefined ? !sessionResumeFailed : undefined
+            resumedOutcome(resumeSessionId, !sessionResumeFailed)
           );
           return;
         } catch (error) {

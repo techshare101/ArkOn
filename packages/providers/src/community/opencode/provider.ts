@@ -21,7 +21,7 @@ import {
   releaseEmbeddedRuntime,
 } from './runtime';
 import { resolveSessionId, streamOpencodeSession } from './session';
-import { withResumedOutcome } from '../../shared/resumed';
+import { withResumedOutcome, resumedOutcome } from '../../shared/resumed';
 
 export { parseModelRef } from './config';
 export { resetEmbeddedRuntime } from './runtime';
@@ -135,13 +135,20 @@ export class OpencodeProvider implements IAgentProvider {
                 'Ensure the workflow node sets nodeConfig.nodeId.'
             );
           }
-          yield* streamMultiAgentOpencodeSession(
-            runtime.client,
-            sessionCwd,
-            nodeId,
-            prompt,
-            parsedModel,
-            requestOptions
+          // Multi-agent always starts fresh — it resolves its own per-node
+          // sessions internally and cannot resume a single prior session. If a
+          // resume was requested, report it as cold (false) so the executor
+          // surfaces the lost continuity instead of silently starting fresh.
+          yield* withResumedOutcome(
+            streamMultiAgentOpencodeSession(
+              runtime.client,
+              sessionCwd,
+              nodeId,
+              prompt,
+              parsedModel,
+              requestOptions
+            ),
+            resumedOutcome(resumeSessionId, false)
           );
           return;
         }
@@ -167,7 +174,7 @@ export class OpencodeProvider implements IAgentProvider {
             parsedModel,
             requestOptions
           ),
-          resumeSessionId !== undefined ? resumed : undefined
+          resumedOutcome(resumeSessionId, resumed)
         );
         return;
       } catch (error) {

@@ -1,5 +1,5 @@
 import { describe, test, expect } from 'bun:test';
-import { withResumedOutcome } from './resumed';
+import { withResumedOutcome, resumedOutcome } from './resumed';
 import type { MessageChunk } from '../types';
 
 async function* gen(...chunks: MessageChunk[]): AsyncGenerator<MessageChunk> {
@@ -58,5 +58,24 @@ describe('withResumedOutcome', () => {
       { type: 'result', resumed: true },
       { type: 'result', resumed: true },
     ]);
+  });
+
+  test('drops the stamp when the stream emits no result chunk (nothing to stamp)', async () => {
+    const out = await collect(
+      withResumedOutcome(gen({ type: 'assistant', content: 'partial' }), false)
+    );
+    expect(out).toEqual([{ type: 'assistant', content: 'partial' }]);
+  });
+});
+
+describe('resumedOutcome', () => {
+  test('returns undefined when no resume was requested, regardless of success', () => {
+    expect(resumedOutcome(undefined, true)).toBeUndefined();
+    expect(resumedOutcome(undefined, false)).toBeUndefined();
+  });
+
+  test('returns the success boolean when a resume was requested', () => {
+    expect(resumedOutcome('sess-1', true)).toBe(true);
+    expect(resumedOutcome('sess-1', false)).toBe(false);
   });
 });

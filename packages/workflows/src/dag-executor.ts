@@ -3146,44 +3146,28 @@ export async function executeDagWorkflow(
             await new Promise(resolve => setTimeout(resolve, delayMs));
           }
 
-          // Replay-on-cold-resume: this node requested a session resume but the
+          // Cold-resume surfacing: this node requested a session resume but the
           // provider reported it came back cold (resumed === false) — the prior
-          // context is gone. Surface it (no silent failure) and re-run the node
-          // ONCE from a clean fresh start rather than trusting the half-resumed
-          // output. Bounded to a single replay and only for a completed node (the
-          // retry loop above already handles failures).
+          // context is gone. Every provider's cold fallback is already a clean
+          // fresh session, so the run we just completed is a valid fresh-context
+          // result; we keep it and persist its fresh session id below. Surface the
+          // lost continuity to the user (no silent failure) so a degraded run isn't
+          // mistaken for a normal resumed one — but do NOT re-run: a replay would
+          // only repeat the same fresh run at double the cost and side effects.
           if (
             resumeSessionId !== undefined &&
             output.state === 'completed' &&
             output.resumed === false
           ) {
             getLog().warn(
-              { nodeId: node.id, provider, workflowRunId: workflowRun.id },
-              'dag.session_resume_failed_replaying'
+              { nodeId: node.id, provider, workflowRunId: workflowRun.id, resumeSessionId },
+              'dag.session_resume_failed'
             );
             await safeSendMessage(
               platform,
               conversationId,
-              `⚠️ Node \`${node.id}\`: could not resume the prior session (provider started fresh). Re-running the node from a clean start.`,
+              `⚠️ Node \`${node.id}\`: could not resume the prior session — continued with a fresh session, so the earlier context was not restored.`,
               { workflowId: workflowRun.id, nodeName: node.id }
-            );
-            output = await executeNodeInternal(
-              deps,
-              platform,
-              conversationId,
-              cwd,
-              workflowRun,
-              node,
-              provider,
-              nodeOptions,
-              artifactsDir,
-              logDir,
-              baseBranch,
-              docsDir,
-              nodeOutputs,
-              undefined, // clean fresh start — do not re-attempt the dead session
-              configuredCommandFolder,
-              issueContext
             );
           }
 

@@ -11,7 +11,7 @@ import type { MessageChunk } from '../types';
  *                  (cold) session
  *
  * Stamping it here keeps every provider's wiring to one line and ensures a
- * failed resume is observable downstream (the dag-executor surfaces/replays on
+ * failed resume is observable downstream (the dag-executor surfaces a warning on
  * `false`) instead of being silently swallowed as a normal fresh turn.
  */
 export async function* withResumedOutcome(
@@ -25,4 +25,21 @@ export async function* withResumedOutcome(
   for await (const chunk of stream) {
     yield chunk.type === 'result' ? { ...chunk, resumed } : chunk;
   }
+}
+
+/**
+ * Compute the `resumed` argument for {@link withResumedOutcome}.
+ *
+ * Returns `undefined` when no resume was attempted (so the stream passes through
+ * untouched); otherwise returns whether the resume succeeded. Centralizes the
+ * "undefined means no resume was requested" guard that every provider shares.
+ */
+export function resumedOutcome(
+  resumeSessionId: string | undefined,
+  succeeded: boolean
+): boolean | undefined {
+  if (resumeSessionId === undefined) {
+    return undefined;
+  }
+  return succeeded;
 }

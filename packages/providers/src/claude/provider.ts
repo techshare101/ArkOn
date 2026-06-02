@@ -41,7 +41,7 @@ import { CLAUDE_CAPABILITIES } from './capabilities';
 import { resolveClaudeBinaryPath } from './binary-resolver';
 import { createLogger } from '@archon/paths';
 import { loadMcpConfig } from '../mcp/config';
-import { withResumedOutcome } from '../shared/resumed';
+import { withResumedOutcome, resumedOutcome } from '../shared/resumed';
 
 /** Lazy-initialized logger (deferred so test mocks can intercept createLogger) */
 let cachedLog: ReturnType<typeof createLogger> | undefined;
@@ -945,7 +945,7 @@ export class ClaudeProvider implements IAgentProvider {
         // session was restored. Hence `true` whenever a resume was requested.
         yield* withResumedOutcome(
           streamClaudeMessages(events, toolResultQueue),
-          resumeSessionId !== undefined ? true : undefined
+          resumedOutcome(resumeSessionId, true)
         );
         return;
       } catch (error) {
