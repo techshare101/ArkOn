@@ -41,6 +41,7 @@ import { CLAUDE_CAPABILITIES } from './capabilities';
 import { resolveClaudeBinaryPath } from './binary-resolver';
 import { createLogger } from '@archon/paths';
 import { loadMcpConfig } from '../mcp/config';
+import { withResumedOutcome } from '../shared/resumed';
 
 /** Lazy-initialized logger (deferred so test mocks can intercept createLogger) */
 let cachedLog: ReturnType<typeof createLogger> | undefined;
@@ -939,7 +940,13 @@ export class ClaudeProvider implements IAgentProvider {
         const events = withFirstMessageTimeout(rawEvents, controller, timeoutMs, diagnostics);
 
         // 5. Stream normalized events
-        yield* streamClaudeMessages(events, toolResultQueue);
+        // Claude resumes-or-errors: an invalid resume id throws (and is
+        // retried/surfaced), so reaching the result stream means the prior
+        // session was restored. Hence `true` whenever a resume was requested.
+        yield* withResumedOutcome(
+          streamClaudeMessages(events, toolResultQueue),
+          resumeSessionId !== undefined ? true : undefined
+        );
         return;
       } catch (error) {
         const err = error as Error;

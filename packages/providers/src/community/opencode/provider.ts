@@ -21,6 +21,7 @@ import {
   releaseEmbeddedRuntime,
 } from './runtime';
 import { resolveSessionId, streamOpencodeSession } from './session';
+import { withResumedOutcome } from '../../shared/resumed';
 
 export { parseModelRef } from './config';
 export { resetEmbeddedRuntime } from './runtime';
@@ -157,13 +158,16 @@ export class OpencodeProvider implements IAgentProvider {
           };
         }
 
-        yield* streamOpencodeSession(
-          runtime.client,
-          sessionCwd,
-          sessionId,
-          prompt,
-          parsedModel,
-          requestOptions
+        yield* withResumedOutcome(
+          streamOpencodeSession(
+            runtime.client,
+            sessionCwd,
+            sessionId,
+            prompt,
+            parsedModel,
+            requestOptions
+          ),
+          resumeSessionId !== undefined ? resumed : undefined
         );
         return;
       } catch (error) {

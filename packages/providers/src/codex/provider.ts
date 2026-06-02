@@ -22,6 +22,7 @@ import { CODEX_CAPABILITIES } from './capabilities';
 import { resolveCodexBinaryPath } from './binary-resolver';
 import { createLogger } from '@archon/paths';
 import { loadMcpConfig } from '../mcp/config';
+import { withResumedOutcome } from '../shared/resumed';
 
 /** Lazy-initialized logger (deferred so test mocks can intercept createLogger) */
 let cachedLog: ReturnType<typeof createLogger> | undefined;
@@ -832,12 +833,15 @@ export class CodexProvider implements IAgentProvider {
           const result = await thread.runStreamed(prompt, turnOptions);
 
           // 5. Stream normalized events (fresh state per attempt to avoid dedup leaks)
-          yield* streamCodexEvents(
-            result.events as AsyncIterable<Record<string, unknown>>,
-            hasOutputFormat,
-            thread.id,
-            attemptController.signal,
-            Boolean(requestOptions?.nodeConfig?.mcp)
+          yield* withResumedOutcome(
+            streamCodexEvents(
+              result.events as AsyncIterable<Record<string, unknown>>,
+              hasOutputFormat,
+              thread.id,
+              attemptController.signal,
+              Boolean(requestOptions?.nodeConfig?.mcp)
+            ),
+            resumeSessionId !== undefined ? !sessionResumeFailed : undefined
           );
           return;
         } catch (error) {
