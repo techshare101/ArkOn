@@ -699,6 +699,7 @@ async function executeNodeInternal(
   let nodeOutputText = ''; // Always accumulate regardless of streaming mode
   let structuredOutput: unknown;
   let newSessionId: string | undefined;
+  let nodeResumed: boolean | undefined;
   let nodeTokens: TokenUsage | undefined;
   let nodeCostUsd: number | undefined;
   let nodeStopReason: string | undefined;
@@ -900,6 +901,7 @@ async function executeNodeInternal(
           lastToolStartedAt = null;
         }
         if (msg.sessionId) newSessionId = msg.sessionId;
+        if (msg.resumed !== undefined) nodeResumed = msg.resumed;
         if (msg.tokens) nodeTokens = msg.tokens;
         if (msg.cost !== undefined) nodeCostUsd = msg.cost;
         if (msg.stopReason !== undefined) nodeStopReason = msg.stopReason;
@@ -1221,6 +1223,7 @@ async function executeNodeInternal(
       sessionId: newSessionId,
       costUsd: nodeCostUsd,
       ...(structuredOutput !== undefined ? { structuredOutput } : {}),
+      ...(nodeResumed !== undefined ? { resumed: nodeResumed } : {}),
     };
   } catch (error) {
     const err = error as Error;
@@ -3141,6 +3144,47 @@ export async function executeDagWorkflow(
             );
 
             await new Promise(resolve => setTimeout(resolve, delayMs));
+          }
+
+          // Replay-on-cold-resume: this node requested a session resume but the
+          // provider reported it came back cold (resumed === false) — the prior
+          // context is gone. Surface it (no silent failure) and re-run the node
+          // ONCE from a clean fresh start rather than trusting the half-resumed
+          // output. Bounded to a single replay and only for a completed node (the
+          // retry loop above already handles failures).
+          if (
+            resumeSessionId !== undefined &&
+            output.state === 'completed' &&
+            output.resumed === false
+          ) {
+            getLog().warn(
+              { nodeId: node.id, provider, workflowRunId: workflowRun.id },
+              'dag.session_resume_failed_replaying'
+            );
+            await safeSendMessage(
+              platform,
+              conversationId,
+              `⚠️ Node \`${node.id}\`: could not resume the prior session (provider started fresh). Re-running the node from a clean start.`,
+              { workflowId: workflowRun.id, nodeName: node.id }
+            );
+            output = await executeNodeInternal(
+              deps,
+              platform,
+              conversationId,
+              cwd,
+              workflowRun,
+              node,
+              provider,
+              nodeOptions,
+              artifactsDir,
+              logDir,
+              baseBranch,
+              docsDir,
+              nodeOutputs,
+              undefined, // clean fresh start — do not re-attempt the dead session
+              configuredCommandFolder,
+              issueContext
+            );
           }
 
           // Persist (or drop) the node's provider session ID for the next run in this scope.

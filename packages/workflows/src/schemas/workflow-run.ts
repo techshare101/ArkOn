@@ -73,6 +73,9 @@ export const nodeOutputSchema = z.discriminatedUnion('state', [
     output: z.string(),
     sessionId: z.string().optional(),
     structuredOutput: z.unknown().optional(),
+    /** Session-resume outcome from the provider: false ⇒ a requested resume came
+     *  back cold (fresh session). Drives the executor's replay-on-cold path. */
+    resumed: z.boolean().optional(),
   }),
   z.object({
     state: z.literal('failed'),
