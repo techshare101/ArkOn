@@ -43,6 +43,7 @@ import type {
   WorkflowLoadError,
   WorkflowSource,
 } from '@archon/workflows/schemas/workflow';
+import type { WorkflowRun } from '@archon/workflows/schemas/workflow-run';
 import { isPerUserGitHubEnabled } from '../github-auth/config';
 import { getDecryptedAccessToken } from '../db/user-github-token-store';
 import { isPerUserProviderKeysEnabled } from '../credentials/config';
@@ -446,6 +447,7 @@ function filterToolIndicators(assistantMessages: string[]): string {
 interface WorkflowDispatchOptions {
   force?: boolean;
   resumeRunId?: string;
+  resumeRun?: WorkflowRun;
 }
 
 /**
@@ -545,11 +547,19 @@ async function dispatchOrchestratorWorkflow(
   // github) resume after approval gates just like web does.
   const resumableRun = options?.force
     ? null
-    : await workflowDb.findResumableRunByParentConversation(
+    : (options?.resumeRun ??
+      (await workflowDb.findResumableRunByParentConversation(
         workflow.name,
         conversation.id,
         codebase.id
-      );
+      )));
+  if (options?.resumeRun && !options.resumeRun.working_path) {
+    await platform.sendMessage(
+      conversationId,
+      `Cannot resume ${options.resumeRun.id}: missing working path.`
+    );
+    return;
+  }
   if (resumableRun?.working_path) {
     if (resumableRun.status !== 'paused' && resumableRun.id !== options?.resumeRunId) {
       const escapedMsg = userMessage.replace(/[\\"`]/g, '\\$&');
@@ -1021,7 +1031,7 @@ export async function handleMessage(
             isolationHints,
             userId,
             workflowSource,
-            { resumeRunId: pausedRun.id }
+            { resumeRunId: pausedRun.id, resumeRun: pausedRun }
           );
           getLog().info(
             { conversationId, workflowRunId: pausedRun.id, workflowName: pausedRun.workflow_name },
@@ -1104,6 +1114,7 @@ export async function handleMessage(
             {
               force: result.workflow.force,
               resumeRunId: result.workflow.resumeRunId,
+              resumeRun: result.workflow.resumeRun,
             }
           );
         }
