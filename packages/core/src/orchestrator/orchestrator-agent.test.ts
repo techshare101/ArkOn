@@ -1354,6 +1354,25 @@ describe('workflow dispatch routing — interactive flag', () => {
     };
   }
 
+  function makeResumableRun(overrides: Partial<WorkflowRun> = {}): WorkflowRun {
+    return {
+      id: 'resumable-run-1',
+      workflow_name: 'test-workflow',
+      conversation_id: 'conv-1',
+      parent_conversation_id: 'conv-1',
+      codebase_id: 'codebase-1',
+      status: 'failed',
+      user_message: 'old failed prompt',
+      metadata: {},
+      started_at: new Date(),
+      completed_at: null,
+      last_activity_at: null,
+      working_path: '/repos/test-repo/worktrees/feature',
+      user_id: null,
+      ...overrides,
+    };
+  }
+
   beforeEach(() => {
     mockExecuteWorkflow.mockClear();
     mockDispatchBackgroundWorkflow.mockClear();
@@ -1394,14 +1413,7 @@ describe('workflow dispatch routing — interactive flag', () => {
     mockGetCodebase.mockReturnValueOnce(Promise.resolve(makeDispatchCodebase()));
     mockHandleCommand.mockReturnValueOnce(Promise.resolve(makeWorkflowResult(true)));
     mockFindResumableRunByParentConversation.mockReturnValueOnce(
-      Promise.resolve({
-        id: 'resumable-run-1',
-        workflow_name: 'test-workflow',
-        working_path: '/repos/test-repo/worktrees/feature',
-        parent_conversation_id: 'conv-1',
-        status: 'failed',
-        user_message: 'old failed prompt',
-      })
+      Promise.resolve(makeResumableRun())
     );
 
     const platform = makePlatform(); // getPlatformType returns 'web'
@@ -1434,14 +1446,12 @@ describe('workflow dispatch routing — interactive flag', () => {
     mockGetCodebase.mockReturnValueOnce(Promise.resolve(makeDispatchCodebase()));
     mockHandleCommand.mockReturnValueOnce(Promise.resolve(makeWorkflowResult(true)));
     mockFindResumableRunByParentConversation.mockReturnValueOnce(
-      Promise.resolve({
-        id: 'resumable-run-preview',
-        workflow_name: 'test-workflow',
-        working_path: '/repos/test-repo/worktrees/feature',
-        parent_conversation_id: 'conv-1',
-        status: 'failed',
-        user_message: priorMessage,
-      })
+      Promise.resolve(
+        makeResumableRun({
+          id: 'resumable-run-preview',
+          user_message: priorMessage,
+        })
+      )
     );
 
     const platform = makePlatform();
@@ -1461,14 +1471,11 @@ describe('workflow dispatch routing — interactive flag', () => {
       Promise.resolve(makeWorkflowResult(true, { args: 'fix \\ path "quoted" `tick`' }))
     );
     mockFindResumableRunByParentConversation.mockReturnValueOnce(
-      Promise.resolve({
-        id: 'resumable-run-escape',
-        workflow_name: 'test-workflow',
-        working_path: '/repos/test-repo/worktrees/feature',
-        parent_conversation_id: 'conv-1',
-        status: 'failed',
-        user_message: 'old failed prompt',
-      })
+      Promise.resolve(
+        makeResumableRun({
+          id: 'resumable-run-escape',
+        })
+      )
     );
 
     const platform = makePlatform();
@@ -1507,14 +1514,7 @@ describe('workflow dispatch routing — interactive flag', () => {
       Promise.resolve(makeWorkflowResult(true, { resumeRunId: 'resumable-run-1' }))
     );
     mockFindResumableRunByParentConversation.mockReturnValueOnce(
-      Promise.resolve({
-        id: 'resumable-run-1',
-        workflow_name: 'test-workflow',
-        working_path: '/repos/test-repo/worktrees/feature',
-        parent_conversation_id: 'conv-1',
-        status: 'failed',
-        user_message: 'old failed prompt',
-      })
+      Promise.resolve(makeResumableRun())
     );
 
     const platform = makePlatform();
@@ -1529,21 +1529,11 @@ describe('workflow dispatch routing — interactive flag', () => {
   });
 
   test('resumeRun option: hydrates the requested run without latest-run lookup', async () => {
-    const requestedRun: WorkflowRun = {
+    const requestedRun = makeResumableRun({
       id: 'old-run',
-      workflow_name: 'test-workflow',
-      conversation_id: 'conv-1',
-      parent_conversation_id: 'conv-1',
-      codebase_id: 'codebase-1',
-      status: 'failed',
       user_message: 'requested prompt',
-      metadata: {},
-      started_at: new Date(),
-      completed_at: null,
-      last_activity_at: null,
       working_path: '/repos/test-repo/worktrees/old',
-      user_id: null,
-    };
+    });
     mockGetOrCreateConversation.mockReturnValueOnce(Promise.resolve(makeDispatchConversation()));
     mockGetCodebase.mockReturnValueOnce(Promise.resolve(makeDispatchCodebase()));
     mockHandleCommand.mockReturnValueOnce(
@@ -1570,21 +1560,11 @@ describe('workflow dispatch routing — interactive flag', () => {
   });
 
   test('resumeRun option: reports requested run with missing working path', async () => {
-    const requestedRun: WorkflowRun = {
+    const requestedRun = makeResumableRun({
       id: 'old-run-missing-path',
-      workflow_name: 'test-workflow',
-      conversation_id: 'conv-1',
-      parent_conversation_id: 'conv-1',
-      codebase_id: 'codebase-1',
-      status: 'failed',
       user_message: 'requested prompt',
-      metadata: {},
-      started_at: new Date(),
-      completed_at: null,
-      last_activity_at: null,
       working_path: null,
-      user_id: null,
-    };
+    });
     mockGetOrCreateConversation.mockReturnValueOnce(Promise.resolve(makeDispatchConversation()));
     mockGetCodebase.mockReturnValueOnce(Promise.resolve(makeDispatchCodebase()));
     mockHandleCommand.mockReturnValueOnce(
@@ -1616,13 +1596,11 @@ describe('workflow dispatch routing — interactive flag', () => {
     mockGetCodebase.mockReturnValueOnce(Promise.resolve(makeDispatchCodebase()));
     mockHandleCommand.mockReturnValueOnce(Promise.resolve(makeWorkflowResult(true)));
     mockFindResumableRunByParentConversation.mockReturnValueOnce(
-      Promise.resolve({
-        id: 'resumable-run-1',
-        workflow_name: 'test-workflow',
-        working_path: '/repos/test-repo/worktrees/feature',
-        parent_conversation_id: 'conv-1',
-        status: 'paused',
-      })
+      Promise.resolve(
+        makeResumableRun({
+          status: 'paused',
+        })
+      )
     );
 
     const platform = makePlatform(); // getPlatformType returns 'web'
@@ -1653,13 +1631,12 @@ describe('workflow dispatch routing — interactive flag', () => {
     mockGetCodebase.mockReturnValueOnce(Promise.resolve(makeDispatchCodebase()));
     mockHandleCommand.mockReturnValueOnce(Promise.resolve(makeWorkflowResult(true)));
     mockFindResumableRunByParentConversation.mockReturnValueOnce(
-      Promise.resolve({
-        id: 'empty-prior-run',
-        workflow_name: 'test-workflow',
-        working_path: '/repos/test-repo/worktrees/feature',
-        parent_conversation_id: 'conv-1',
-        status: 'paused',
-      })
+      Promise.resolve(
+        makeResumableRun({
+          id: 'empty-prior-run',
+          status: 'paused',
+        })
+      )
     );
     mockHydrateResumableRun.mockReturnValueOnce(Promise.resolve(null));
 
