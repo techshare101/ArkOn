@@ -1,6 +1,6 @@
 # Console (spike)
 
-A greenfield spike of Archon's web UI built around four primitives:
+A greenfield spike of ArkOn's web UI built around four primitives:
 
 - **Project · Run · Workflow · Worktree**
 

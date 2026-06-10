@@ -1,6 +1,6 @@
 # Community Forge Adapters
 
-Forge adapters connect Archon to code hosting platforms (GitHub, GitLab, etc.) via webhooks.
+Forge adapters connect ArkOn to code hosting platforms (GitHub, GitLab, etc.) via webhooks.
 
 ## Interface
 

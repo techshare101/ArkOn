@@ -1,8 +1,8 @@
 <p align="center">
-  <img src="assets/logo.png" alt="Archon" width="160" />
+  <img src="assets/logo.png" alt="ArkOn" width="160" />
 </p>
 
-<h1 align="center">Archon</h1>
+<h1 align="center">ArkOn</h1>
 
 <p align="center">
   The first open-source harness builder for AI coding. Make AI coding deterministic and repeatable.
@@ -14,21 +14,21 @@
 
 <p align="center">
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="License: MIT" /></a>
-  <a href="https://github.com/coleam00/Archon/actions/workflows/test.yml"><img src="https://github.com/coleam00/Archon/actions/workflows/test.yml/badge.svg" alt="CI" /></a>
-  <a href="https://archon.diy/docs/"><img src="https://img.shields.io/badge/docs-archon.diy-blue" alt="Docs" /></a>
+  <a href="https://github.com/techshare101/ArkOn/actions/workflows/test.yml"><img src="https://github.com/techshare101/ArkOn/actions/workflows/test.yml/badge.svg" alt="CI" /></a>
+  <a href="https://arkon.sh/docs/"><img src="https://img.shields.io/badge/docs-arkon.sh-blue" alt="Docs" /></a>
 </p>
 
 ---
 
-Archon is a workflow engine for AI coding agents. Define your development processes as YAML workflows - planning, implementation, validation, code review, PR creation - and run them reliably across all your projects.
+ArkOn is a workflow engine for AI coding agents. Define your development processes as YAML workflows - planning, implementation, validation, code review, PR creation - and run them reliably across all your projects.
 
-Like what Dockerfiles did for infrastructure and GitHub Actions did for CI/CD - Archon does for AI coding workflows. Think n8n, but for software development.
+Like what Dockerfiles did for infrastructure and GitHub Actions did for CI/CD - ArkOn does for AI coding workflows. Think n8n, but for software development.
 
-## Why Archon?
+## Why ArkOn?
 
 When you ask an AI agent to "fix this bug", what happens depends on the model's mood. It might skip planning. It might forget to run tests. It might write a PR description that ignores your template. Every run is different.
 
-Archon fixes this. Encode your development process as a workflow. The workflow defines the phases, validation gates, and artifacts. The AI fills in the intelligence at each step, but the structure is deterministic and owned by you.
+ArkOn fixes this. Encode your development process as a workflow. The workflow defines the phases, validation gates, and artifacts. The AI fills in the intelligence at each step, but the structure is deterministic and owned by you.
 
 - **Repeatable** - Same workflow, same sequence, every time. Plan, implement, validate, review, PR.
 - **Isolated** - Every workflow run gets its own git worktree. Run 5 fixes in parallel with no conflicts.
@@ -38,7 +38,7 @@ Archon fixes this. Encode your development process as a workflow. The workflow d
 
 ## What It Looks Like
 
-Here's an example of an Archon workflow that plans, implements in a loop until tests pass, gets your approval, then creates the PR:
+Here's an example of an ArkOn workflow that plans, implements in a loop until tests pass, gets your approval, then creates the PR:
 
 ```yaml
 # .archon/workflows/build-feature.yaml
@@ -73,7 +73,7 @@ nodes:
     prompt: "Push changes and create a pull request"
 ```
 
-Tell your coding agent what you want, and Archon handles the rest:
+Tell your coding agent what you want, and ArkOn handles the rest:
 
 ```
 You: Use archon to add dark mode to the settings page
@@ -91,17 +91,17 @@ Agent: I'll run the archon-idea-to-pr workflow for this.
 
 ## Previous Version
 
-Looking for the original Python-based Archon (task management + RAG)? It's fully preserved on the [`archive/v1-task-management-rag`](https://github.com/coleam00/Archon/tree/archive/v1-task-management-rag) branch.
+Looking for the original Python-based Archon (task management + RAG, by coleam)? It's fully preserved upstream on the [`archive/v1-task-management-rag`](https://github.com/coleam00/archon/tree/archive/v1-task-management-rag) branch. ArkOn is a downstream proprietary fork of that lineage.
 
 ## Getting Started
 
-> **Most users should start with the [Full Setup](#full-setup-5-minutes)** - it walks you through credentials, installs the Archon skill into your projects, and gives you the web dashboard.
+> **Most users should start with the [Full Setup](#full-setup-5-minutes)** - it walks you through credentials, installs the ArkOn skill into your projects, and gives you the web dashboard.
 >
 > **Already have Claude Code and just want the CLI?** Jump to the [Quick Install](#quick-install-30-seconds).
 
 ### Full Setup (5 minutes)
 
-Clone the repo and use the guided setup wizard. This configures credentials, platform integrations, and copies the Archon skill into your target projects.
+Clone the repo and use the guided setup wizard. This configures credentials, platform integrations, and copies the ArkOn skill into your target projects.
 
 <details>
 <summary><b>Prerequisites</b> - Bun, Claude Code, and the GitHub CLI</summary>
@@ -142,15 +142,15 @@ irm https://claude.ai/install.ps1 | iex
 </details>
 
 ```bash
-git clone https://github.com/coleam00/Archon
-cd Archon
+git clone https://github.com/techshare101/ArkOn
+cd ArkOn
 bun install
 claude
 ```
 
-Then say: **"Set up Archon"**
+Then say: **"Set up ArkOn"**
 
-The setup wizard walks you through everything: CLI installation, authentication, platform selection, and copies the Archon skill to your target repo.
+The setup wizard walks you through everything: CLI installation, authentication, platform selection, and copies the ArkOn skill to your target repo.
 
 ### Quick Install (30 seconds)
 
@@ -168,11 +168,11 @@ irm https://archon.diy/install.ps1 | iex
 
 **Homebrew**
 ```bash
-brew install coleam00/archon/archon
+brew install techshare101/arkon/arkon
 ```
 
 > **Compiled binaries need a `CLAUDE_BIN_PATH`.** The quick-install binaries
-> don't bundle Claude Code. Install it separately, then point Archon at it:
+> don't bundle Claude Code. Install it separately, then point ArkOn at it:
 >
 > ```bash
 > # macOS / Linux / WSL
@@ -187,7 +187,7 @@ brew install coleam00/archon/archon
 > Or set `assistants.claude.claudeBinaryPath` in `~/.archon/config.yaml`.
 > The Docker image ships Claude Code pre-installed. See [AI Assistants → Binary path configuration](https://archon.diy/getting-started/ai-assistants/#binary-path-configuration-compiled-binaries-only) for details.
 
-### Start Using Archon
+### Start Using ArkOn
 
 Once you've completed either setup path, go to your project and start working:
 
@@ -206,11 +206,11 @@ What archon workflows do I have? When would I use each one?
 
 The coding agent handles workflow selection, branch naming, and worktree isolation for you. Projects are registered automatically the first time they're used.
 
-> **Important:** Always run Claude Code from your target repo, not from the Archon repo. The setup wizard copies the Archon skill into your project so it works from there.
+> **Important:** Always run Claude Code from your target repo, not from the ArkOn repo. The setup wizard copies the ArkOn skill into your project so it works from there.
 
 ## Web UI
 
-Archon includes a web dashboard for chatting with your coding agent, running workflows, and monitoring activity. Binary installs: run `archon serve` to download and start the web UI in one step. From source: ask your coding agent to run the frontend from the Archon repo, or run `bun run dev` from the repo root yourself.
+ArkOn includes a web dashboard for chatting with your coding agent, running workflows, and monitoring activity. Binary installs: run `arkon serve` to download and start the web UI in one step. From source: ask your coding agent to run the frontend from the ArkOn repo, or run `bun run dev` from the repo root yourself.
 
 Register a project by clicking **+** next to "Project" in the chat sidebar - enter a GitHub URL or local path. Then start a conversation, invoke workflows, and watch progress in real time.
 
@@ -226,7 +226,7 @@ See the [Web UI Guide](https://archon.diy/adapters/web/) for full documentation.
 
 ## What Can You Automate?
 
-Archon ships with workflows for common development tasks:
+ArkOn ships with workflows for common development tasks:
 
 | Workflow | What it does |
 |----------|-------------|
@@ -250,7 +250,7 @@ Archon ships with workflows for common development tasks:
 | `archon-remotion-generate` | Generate or modify Remotion video compositions with AI |
 | `archon-resolve-conflicts` | Detect merge conflicts → analyze both sides → resolve → validate → commit |
 
-Archon ships 19 default workflows - run `archon workflow list` or describe what you want and the router picks the right one.
+ArkOn ships 19 default workflows - run `arkon workflow list` or describe what you want and the router picks the right one.
 
 **Or define your own.** Default workflows are great starting points - copy one from `.archon/workflows/defaults/` and customize it. Workflows are YAML files in `.archon/workflows/`, commands are markdown files in `.archon/commands/`. Same-named files in your repo override the bundled defaults. Commit them - your whole team runs the same process.
 
@@ -309,7 +309,7 @@ Full documentation is available at **[archon.diy/docs](https://archon.diy/docs/)
 | Topic | Description |
 |-------|-------------|
 | [Getting Started](https://archon.diy/getting-started/overview/) | Setup guide (Web UI or CLI) |
-| [The Book of Archon](https://archon.diy/book/) | 10-chapter narrative tutorial |
+| [The Book of ArkOn](https://arkon.sh/book/) | 10-chapter narrative tutorial |
 | [CLI Reference](https://archon.diy/reference/cli/) | Full CLI reference |
 | [Authoring Workflows](https://archon.diy/guides/authoring-workflows/) | Create custom YAML workflows |
 | [Authoring Commands](https://archon.diy/guides/authoring-commands/) | Create reusable AI commands |
@@ -323,12 +323,12 @@ Full documentation is available at **[archon.diy/docs](https://archon.diy/docs/)
 
 ## Telemetry
 
-Archon sends a few anonymous events so maintainers can see which workflows get real usage, on what platforms, and whether runs succeed — and prioritize accordingly. **No PII, ever.** Events: `archon_started` (once per CLI invocation / server boot), `workflow_invoked` (each workflow start), and `workflow_completed` / `workflow_failed` (each run outcome).
+ArkOn sends a few anonymous events so maintainers can see which workflows get real usage, on what platforms, and whether runs succeed — and prioritize accordingly. **No PII, ever.** Events: `archon_started` (once per CLI invocation / server boot), `workflow_invoked` (each workflow start), and `workflow_completed` / `workflow_failed` (each run outcome).
 
 **What's collected (categorical only):**
-- **Workflow name** — the real name for *bundled* (Archon-authored) workflows; `"custom"` for your own workflows, so private names never leave your machine.
+- **Workflow name** — the real name for *bundled* (ArkOn-authored) workflows; `"custom"` for your own workflows, so private names never leave your machine.
 - **Run shape & outcome** — platform (`cli`/`web`/`slack`/…), provider id (plus the model id on `workflow_invoked`), node count, which node types are used, success/failure, duration, and a categorical failure reason (never raw error text).
-- **Machine context** — OS, architecture, Archon version, runtime, whether it's a binary build, and a CI flag.
+- **Machine context** — OS, architecture, ArkOn version, runtime, whether it's a binary build, and a CI flag.
 - A random install UUID stored at `~/.archon/telemetry-id`. Nothing else.
 
 **What's *not* collected:** your code, prompts, messages, custom workflow names, workflow descriptions, git remotes, file paths, usernames, tokens, AI output, error message text, your IP address, your geographic location — none of it.
@@ -349,13 +349,13 @@ Self-host PostHog or use a different project by setting `POSTHOG_API_KEY` and `P
 
 ## Contributing
 
-Contributions welcome! See the open [issues](https://github.com/coleam00/Archon/issues) for things to work on.
+Contributions welcome! See the open [issues](https://github.com/techshare101/ArkOn/issues) for things to work on.
 
 Please read [CONTRIBUTING.md](CONTRIBUTING.md) before submitting a pull request.
 
 ## Star History
 
-[![Star History Chart](https://api.star-history.com/chart?repos=coleam00/Archon&type=date&legend=top-left)](https://www.star-history.com/?repos=coleam00%2FArchon&type=date&legend=top-left)
+[![Star History Chart](https://api.star-history.com/chart?repos=techshare101/ArkOn&type=date&legend=top-left)](https://www.star-history.com/?repos=techshare101%2FArkOn&type=date&legend=top-left)
 
 ## License
 

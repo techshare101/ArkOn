@@ -1,6 +1,6 @@
 # Contributing
 
-Thank you for your interest in contributing to Archon!
+Thank you for your interest in contributing to ArkOn!
 
 ## Getting Started
 
@@ -60,13 +60,13 @@ See [CLAUDE.md](./CLAUDE.md) for detailed architecture documentation.
 
 ## Contributing Workflows to the Marketplace
 
-Share your Archon workflows with the community by adding an entry to the marketplace registry at [`packages/docs-web/src/data/marketplace.ts`](packages/docs-web/src/data/marketplace.ts).
+Share your ArkOn workflows with the community by adding an entry to the marketplace registry at [`packages/docs-web/src/data/marketplace.ts`](packages/docs-web/src/data/marketplace.ts).
 
 ### How to Submit
 
 1. Keep your workflow in a **public GitHub repository** — either as a single YAML file or a directory
 2. Pin it to a specific commit SHA (ensures immutability after merge)
-3. Fork Archon and add an entry to `packages/docs-web/src/data/marketplace.ts`
+3. Fork ArkOn and add an entry to `packages/docs-web/src/data/marketplace.ts`
 4. Open a PR — automated lint validates your entry before review
 
 ### Submission Formats
@@ -122,4 +122,4 @@ By submitting, you attest that:
 
 ## Questions?
 
-Open an [issue](https://github.com/coleam00/Archon/issues) or start a [discussion](https://github.com/coleam00/Archon/discussions).
+Open an [issue](https://github.com/techshare101/ArkOn/issues) or start a [discussion](https://github.com/techshare101/ArkOn/discussions).

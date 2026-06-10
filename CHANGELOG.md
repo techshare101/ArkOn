@@ -1,5 +1,11 @@
 # Changelog
 
+> **ArkOn is a proprietary fork of [Archon](https://github.com/coleam00/archon) by coleam.**
+> This changelog preserves the upstream Archon project's release history; future
+> ArkOn-specific entries will be appended under their own heading below. Internal
+> package names, npm scopes, and import paths remain `archon` to preserve build
+> stability — only user-facing branding has been renamed to ArkOn.
+
 All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
