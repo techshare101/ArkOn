@@ -142,6 +142,31 @@ export interface PiProviderDefaults {
 }
 
 /**
+ * Community provider defaults for omp (oh-my-pi, @oh-my-pi/pi-coding-agent).
+ *
+ * omp is driven as a CLI subprocess in RPC mode (`omp --mode rpc`). v1 minimal
+ * shape mirroring CodexProviderDefaults; extend as knobs are actually wired in.
+ */
+export interface OmpProviderDefaults {
+  [key: string]: unknown;
+  /**
+   * Default model ref in '<omp-provider-id>/<model-id>' format, e.g.
+   * 'minimax/MiniMax-M2', 'anthropic/claude-sonnet-4.5'. Passed to omp's
+   * `set_model` RPC command after splitting into {provider, modelId}. Left
+   * unset by default: the user picks a model via `omp` `/login` + this config,
+   * because omp's exact MiniMax provider/modelId strings are login-gated and
+   * not confirmable at build time.
+   */
+  model?: string;
+  /**
+   * Path to the `omp` CLI binary. Overrides PATH lookup; mirrors
+   * `CodexProviderDefaults.codexBinaryPath` for compiled-Archon parity. Also
+   * settable via the `OMP_BIN_PATH` env var (env wins).
+   */
+  ompBinaryPath?: string;
+}
+
+/**
  * Community provider defaults for OpenCode (opencode-ai).
  * Minimal shape — extend as capabilities are wired in.
  */
