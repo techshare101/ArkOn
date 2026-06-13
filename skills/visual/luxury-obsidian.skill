@@ -1,0 +1,204 @@
+---
+name: luxury-obsidian
+version: 1.0.0
+domain: visual-design
+description: Sovereign Design Protocol — Luxury Obsidian UI system for premium digital experiences
+author: ArkOn Architect
+tags: [ui, design-system, luxury, obsidian, dark-mode, premium]
+---
+
+# 🖤 Luxury Obsidian Design Protocol
+
+## Purpose
+Enforce a cohesive, premium dark-mode aesthetic across all ArkOn digital properties. Every pixel communicates authority, exclusivity, and technological sophistication.
+
+---
+
+## 🎨 Core Design Tokens
+
+### Color Palette
+```css
+:root {
+  /* Primary Obsidian Stack */
+  --obsidian-void:       #0a0a0f;    /* Deepest background */
+  --obsidian-surface:    #111118;    /* Card/panel surfaces */
+  --obsidian-elevated:   #1a1a24;    /* Elevated components */
+  --obsidian-border:     #2a2a3a;    /* Subtle borders */
+  
+  /* Accent & Glow */
+  --accent-platinum:     #e8e8f0;    /* Primary text */
+  --accent-silver:       #a0a0b8;    /* Secondary text */
+  --accent-gold:         #d4af37;    /* Premium highlights */
+  --accent-electric:     #6366f1;    /* Interactive elements */
+  
+  /* Gradient System */
+  --gradient-sovereign:  linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 50%, #0a0a0f 100%);
+  --gradient-glow:       linear-gradient(180deg, rgba(99, 102, 241, 0.08) 0%, transparent 60%);
+  --gradient-card:       linear-gradient(145deg, #111118 0%, #0d0d14 100%);
+  --gradient-gold-edge:  linear-gradient(90deg, transparent, #d4af37, transparent);
+}
+```
+
+### Typography Scale
+```css
+:root {
+  --font-display:    'Inter', -apple-system, sans-serif;
+  --font-mono:       'JetBrains Mono', 'Fira Code', monospace;
+  
+  --text-xs:         0.75rem;    /* 12px — Labels */
+  --text-sm:         0.875rem;   /* 14px — Body small */
+  --text-base:       1rem;       /* 16px — Body */
+  --text-lg:         1.125rem;   /* 18px — Body large */
+  --text-xl:         1.25rem;    /* 20px — H4 */
+  --text-2xl:        1.5rem;     /* 24px — H3 */
+  --text-3xl:        1.875rem;   /* 30px — H2 */
+  --text-4xl:        2.25rem;    /* 36px — H1 */
+  --text-5xl:        3rem;       /* 48px — Hero */
+  
+  --tracking-tight:  -0.025em;
+  --tracking-normal: 0;
+  --tracking-wide:   0.05em;
+  --leading-tight:   1.25;
+  --leading-normal:  1.6;
+}
+```
+
+### Spatial System
+```css
+:root {
+  --space-1:   0.25rem;   /* 4px */
+  --space-2:   0.5rem;    /* 8px */
+  --space-3:   0.75rem;   /* 12px */
+  --space-4:   1rem;      /* 16px */
+  --space-6:   1.5rem;    /* 24px */
+  --space-8:   2rem;      /* 32px */
+  --space-12:  3rem;      /* 48px */
+  --space-16:  4rem;      /* 64px */
+  --space-24:  6rem;      /* 96px */
+  
+  --radius-sm: 0.375rem;  /* 6px */
+  --radius-md: 0.5rem;    /* 8px */
+  --radius-lg: 0.75rem;   /* 12px */
+  --radius-xl: 1rem;      /* 16px */
+  --radius-full: 9999px;
+}
+```
+
+### Effect Tokens
+```css
+:root {
+  /* Glassmorphism */
+  --blur-glass:        blur(20px);
+  --blur-heavy:        blur(40px);
+  --bg-glass:          rgba(10, 10, 15, 0.7);
+  --bg-glass-light:    rgba(26, 26, 36, 0.5);
+  
+  /* Shadows */
+  --shadow-sm:         0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-md:         0 4px 6px -1px rgba(0, 0, 0, 0.5);
+  --shadow-lg:         0 10px 15px -3px rgba(0, 0, 0, 0.6);
+  --shadow-glow:       0 0 20px rgba(99, 102, 241, 0.15);
+  --shadow-gold:       0 0 30px rgba(212, 175, 55, 0.1);
+  
+  /* Transitions */
+  --ease-smooth:       cubic-bezier(0.4, 0, 0.2, 1);
+  --duration-fast:     150ms;
+  --duration-normal:   300ms;
+  --duration-slow:     500ms;
+}
+```
+
+---
+
+## 📐 Component Patterns
+
+### Card — Sovereign
+```css
+.card-sovereign {
+  background: var(--gradient-card);
+  border: 1px solid var(--obsidian-border);
+  border-radius: var(--radius-lg);
+  backdrop-filter: var(--blur-glass);
+  box-shadow: var(--shadow-md);
+  padding: var(--space-6);
+  transition: all var(--duration-normal) var(--ease-smooth);
+}
+
+.card-sovereign:hover {
+  border-color: var(--accent-electric);
+  box-shadow: var(--shadow-glow);
+  transform: translateY(-2px);
+}
+```
+
+### Button — Premium
+```css
+.btn-premium {
+  background: var(--accent-electric);
+  color: white;
+  font-weight: 600;
+  padding: var(--space-3) var(--space-6);
+  border-radius: var(--radius-md);
+  border: none;
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  font-size: var(--text-sm);
+  transition: all var(--duration-fast) var(--ease-smooth);
+  box-shadow: 0 0 0 0 rgba(99, 102, 241, 0);
+}
+
+.btn-premium:hover {
+  box-shadow: var(--shadow-glow);
+  transform: translateY(-1px);
+}
+```
+
+### Glass Panel
+```css
+.glass-panel {
+  background: var(--bg-glass);
+  backdrop-filter: var(--blur-glass);
+  -webkit-backdrop-filter: var(--blur-glass);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: var(--radius-xl);
+}
+```
+
+---
+
+## ✅ UI Quality Checklist
+
+### Before Shipping Any Interface:
+- [ ] Background uses `--obsidian-void` (#0a0a0f) as base
+- [ ] All cards have glassmorphism (`backdrop-filter: blur(20px)`)
+- [ ] Border color is `--obsidian-border` — never pure gray
+- [ ] Text hierarchy uses at minimum 3 levels of contrast
+- [ ] Interactive elements have glow-on-hover transitions
+- [ ] No pure white (#fff) — use `--accent-platinum` (#e8e8f0) max
+- [ ] Typography uses tight tracking for headers, normal for body
+- [ ] Spacing follows the 4px grid (multiples of --space-1)
+- [ ] Gold accent used sparingly — only for premium/featured elements
+- [ ] All transitions use `--ease-smooth` cubic-bezier
+- [ ] Minimum touch target: 44px × 44px
+- [ ] Contrast ratio ≥ 4.5:1 for body text on obsidian backgrounds
+- [ ] No orphaned text (min 2 words on last line of paragraphs)
+- [ ] Loading states use skeleton animations with obsidian gradients
+
+---
+
+## 🚫 Anti-Patterns (Never Do)
+
+1. Light mode fallback — this is a sovereign dark-only system
+2. Pure black (#000) backgrounds — always use #0a0a0f minimum
+3. Saturated colors without opacity/blend — everything blends with obsidian
+4. Sharp corners on containers — minimum radius-sm (6px)
+5. Instant transitions — all state changes must animate
+6. White borders or dividers — use rgba(255,255,255,0.06) max
+7. Stock component libraries without obsidian theming override
+
+---
+
+## 🔧 Integration Notes
+
+When loading this skill, apply tokens to the project's global stylesheet or Tailwind config.
+For Tailwind projects, map tokens to `theme.extend.colors` and `theme.extend.backdropBlur`.

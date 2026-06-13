@@ -1,0 +1,68 @@
+{
+  "$schema": "https://arkon.dev/schemas/skills-manifest-v1.json",
+  "version": "1.0.0",
+  "registry": "ArkOn Sovereign Skill Registry",
+  "updated": "2026-06-13T00:57:00-05:00",
+  "author": "ArkOn Architect",
+  "description": "Central index of all ArkOn skill modules available for agent loading and orchestration.",
+  "skills": [
+    {
+      "id": "luxury-obsidian",
+      "name": "Luxury Obsidian Design Protocol",
+      "path": "visual/luxury-obsidian.skill",
+      "domain": "visual-design",
+      "version": "1.0.0",
+      "description": "Sovereign dark-mode UI system with CSS tokens, component patterns, glassmorphism effects, and quality checklists for premium digital experiences.",
+      "tags": ["ui", "design-system", "luxury", "obsidian", "dark-mode", "premium", "css-tokens"],
+      "load_priority": "on-demand",
+      "dependencies": [],
+      "use_when": [
+        "Building any user-facing interface",
+        "Designing landing pages or dashboards",
+        "Reviewing UI for brand consistency",
+        "Creating Tailwind or CSS configurations"
+      ]
+    },
+    {
+      "id": "hormozi-gtm",
+      "name": "Hormozi GTM Protocol",
+      "path": "business/hormozi-gtm.skill",
+      "domain": "business-strategy",
+      "version": "1.0.0",
+      "description": "High-ticket positioning framework with Value Ladder architecture, Outcome-First copy formulas, pricing standards, and qualification criteria.",
+      "tags": ["gtm", "pricing", "value-ladder", "copywriting", "positioning", "high-ticket", "sales"],
+      "load_priority": "on-demand",
+      "dependencies": [],
+      "use_when": [
+        "Writing proposals or pricing",
+        "Creating sales copy or landing pages",
+        "Structuring offers or packages",
+        "Qualifying leads or designing funnels",
+        "Building lead magnets or onboarding flows"
+      ]
+    },
+    {
+      "id": "agentic-seo",
+      "name": "Agentic SEO Protocol",
+      "path": "seo/agentic-seo.skill",
+      "domain": "seo-automation",
+      "version": "1.0.0",
+      "description": "AI-first SEO system with JSON-LD templates, machine-readable content standards, and a 5-step MedSpa audit workflow for local business optimization.",
+      "tags": ["seo", "json-ld", "schema", "structured-data", "ai-optimization", "medspa", "local-seo"],
+      "load_priority": "on-demand",
+      "dependencies": [],
+      "use_when": [
+        "Deploying structured data on any website",
+        "Auditing SEO for local businesses",
+        "Optimizing content for AI discovery",
+        "Building MedSpa or healthcare sites",
+        "Implementing schema.org markup"
+      ]
+    }
+  ],
+  "loading_protocol": {
+    "method": "Read the .skill file contents and apply the enclosed standards, templates, and checklists to the current task context.",
+    "discovery": "Agents should consult this manifest to identify which skills are relevant to their current task.",
+    "activation": "Load skill contents into working context when task domain matches skill domain or use_when triggers."
+  }
+}
