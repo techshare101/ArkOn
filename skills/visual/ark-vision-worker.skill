@@ -1,0 +1,108 @@
+# ============================================================
+# SKILL: Ark Vision Worker
+# ENGINE: Zamba2-VL (1.2B / 2.7B)
+# DOMAIN: Visual Extraction & Document Intelligence
+# VERSION: 1.0.0
+# AUTHOR: ArkOn Architect
+# CREATED: 2026-06-14
+# ============================================================
+# PURPOSE:
+# High-speed, low-latency visual extraction layer for ProofAI,
+# SchemaForge, and Ark Memory. Provides structured JSON output
+# from images, documents, screenshots, and video frames.
+# ============================================================
+
+## ARCHITECTURE NOTES
+# Zamba2-VL uses a hybrid Mamba2 + Transformer architecture:
+# - Mamba2 SSM blocks handle long-range sequential context with O(n) complexity
+# - Shared Transformer attention blocks inject cross-modal reasoning at key layers
+# - LoRA adapters enable rapid domain fine-tuning without full retraining
+# - Result: 3x inference throughput vs pure-transformer VLMs at equivalent quality
+
+## EXTRACTION SCHEMA
+
+```json
+{
+  "$schema": "https://arkon.dev/schemas/vision-extraction-v1.json",
+  "output_format": {
+    "entities": [
+      {
+        "id": "string (uuid)",
+        "type": "string (enum: text|number|date|currency|name|address|signature|logo|table|form_field|barcode|stamp)",
+        "value": "string (extracted content)",
+        "confidence": "float (0.0 - 1.0)",
+        "coordinates": {
+          "bbox": [x_min, y_min, x_max, y_max],
+          "normalized": true,
+          "page": "integer (1-indexed)"
+        },
+        "metadata": {
+          "source_region": "string (header|body|footer|sidebar|annotation)",
+          "language": "string (ISO 639-1)",
+          "orientation": "float (degrees, 0-360)"
+        }
+      }
+    ],
+    "document_metadata": {
+      "page_count": "integer",
+      "resolution_dpi": "integer",
+      "detected_layout": "string (single_column|multi_column|form|table|freeform)",
+      "processing_time_ms": "integer"
+    },
+    "reasoning_handoff": {
+      "required": "boolean",
+      "complexity_score": "float (0.0 - 1.0)",
+      "suggested_target": "string (claude|minimax|local_reasoning)",
+      "context_payload": "object (pre-filled extraction context for downstream)"
+    }
+  }
+}
+```
+
+## OPERATIONAL RULES
+
+### Priority: LOW LATENCY
+1. Target extraction time: < 200ms per page (single GPU, batch=1)
+2. Batch processing: up to 32 pages concurrent, < 3s total
+3. If extraction confidence < 0.7 on critical fields, escalate to reasoning layer
+4. Never block on network calls during extraction phase
+
+### Pre-fill Optimization
+1. Use document type classification (first 50ms) to load domain-specific extraction templates
+2. Pre-fill known field positions from template cache before running full extraction
+3. Template hit rate target: > 80% on recurring document types
+4. Cache warm templates in GPU memory for zero-cold-start on frequent document classes
+
+### Reasoning Layer Handoff Protocol
+1. TRIGGER: confidence < 0.7 OR complex_layout OR multi-entity_relationship
+2. PACKAGE: Send pre-filled extraction + raw image region to reasoning target
+3. TARGETS (priority order):
+   a. Claude (Sonnet/Opus) — complex reasoning, multi-step inference
+   b. MiniMax — cost-efficient bulk validation
+   c. Local reasoning (Qwen2.5) — air-gapped / offline fallback
+4. RESPONSE: Merge reasoning corrections back into extraction output
+5. LATENCY BUDGET: Handoff adds max 2s; timeout and return best-effort after 5s
+
+### Integration Points
+- **ProofAI**: Feed extracted entities as evidence nodes with confidence scores
+- **SchemaForge**: Auto-generate schema definitions from detected document structures
+- **Ark Memory**: Index extracted content with spatial coordinates for retrieval
+
+### Quality Gates
+- Minimum confidence threshold for auto-accept: 0.85
+- Human review queue trigger: confidence < 0.6 on any critical field
+- Extraction drift detection: compare against golden set weekly
+- Model refresh cycle: bi-weekly LoRA fine-tune on correction feedback
+
+## ACTIVATION TRIGGERS
+- Image/PDF/screenshot uploaded for data extraction
+- Document processing pipeline invoked
+- ProofAI evidence ingestion from visual sources
+- SchemaForge document structure analysis
+- Ark Memory visual content indexing
+
+## DEPENDENCIES
+- GPU runtime (CUDA 12.x or Metal for Apple Silicon)
+- Zamba2-VL model weights (HuggingFace: Zyphra/Zamba2-VL-2.7B)
+- vLLM or TensorRT-LLM serving backend
+- Redis for template cache

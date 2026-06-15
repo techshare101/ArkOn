@@ -2,7 +2,7 @@
   "$schema": "https://arkon.dev/schemas/skills-manifest-v1.json",
   "version": "1.0.0",
   "registry": "ArkOn Sovereign Skill Registry",
-  "updated": "2026-06-13T00:57:00-05:00",
+  "updated": "2026-06-14T20:48:00-05:00",
   "author": "ArkOn Architect",
   "description": "Central index of all ArkOn skill modules available for agent loading and orchestration.",
   "skills": [
@@ -13,7 +13,15 @@
       "domain": "visual-design",
       "version": "1.0.0",
       "description": "Sovereign dark-mode UI system with CSS tokens, component patterns, glassmorphism effects, and quality checklists for premium digital experiences.",
-      "tags": ["ui", "design-system", "luxury", "obsidian", "dark-mode", "premium", "css-tokens"],
+      "tags": [
+        "ui",
+        "design-system",
+        "luxury",
+        "obsidian",
+        "dark-mode",
+        "premium",
+        "css-tokens"
+      ],
       "load_priority": "on-demand",
       "dependencies": [],
       "use_when": [
@@ -30,7 +38,15 @@
       "domain": "business-strategy",
       "version": "1.0.0",
       "description": "High-ticket positioning framework with Value Ladder architecture, Outcome-First copy formulas, pricing standards, and qualification criteria.",
-      "tags": ["gtm", "pricing", "value-ladder", "copywriting", "positioning", "high-ticket", "sales"],
+      "tags": [
+        "gtm",
+        "pricing",
+        "value-ladder",
+        "copywriting",
+        "positioning",
+        "high-ticket",
+        "sales"
+      ],
       "load_priority": "on-demand",
       "dependencies": [],
       "use_when": [
@@ -48,7 +64,15 @@
       "domain": "seo-automation",
       "version": "1.0.0",
       "description": "AI-first SEO system with JSON-LD templates, machine-readable content standards, and a 5-step MedSpa audit workflow for local business optimization.",
-      "tags": ["seo", "json-ld", "schema", "structured-data", "ai-optimization", "medspa", "local-seo"],
+      "tags": [
+        "seo",
+        "json-ld",
+        "schema",
+        "structured-data",
+        "ai-optimization",
+        "medspa",
+        "local-seo"
+      ],
       "load_priority": "on-demand",
       "dependencies": [],
       "use_when": [
@@ -57,6 +81,35 @@
         "Optimizing content for AI discovery",
         "Building MedSpa or healthcare sites",
         "Implementing schema.org markup"
+      ]
+    },
+    {
+      "id": "ark-vision-worker",
+      "name": "Ark Vision Worker",
+      "path": "visual/ark-vision-worker.skill",
+      "domain": "visual-extraction",
+      "version": "1.0.0",
+      "description": "High-speed visual extraction layer powered by Zamba2-VL (Mamba2 + Transformer hybrid). Produces structured JSON with entities, confidence scores, and spatial coordinates for ProofAI, SchemaForge, and Ark Memory.",
+      "tags": [
+        "vision",
+        "ocr",
+        "extraction",
+        "zamba2-vl",
+        "mamba2",
+        "document-ai",
+        "low-latency",
+        "proofai",
+        "schemaforge"
+      ],
+      "load_priority": "on-demand",
+      "dependencies": [],
+      "use_when": [
+        "Extracting data from images, PDFs, or screenshots",
+        "Processing documents for ProofAI evidence ingestion",
+        "Auto-generating schemas from document structures",
+        "Indexing visual content into Ark Memory",
+        "Running OCR or layout analysis on uploaded files",
+        "Building document processing pipelines"
       ]
     }
   ],
