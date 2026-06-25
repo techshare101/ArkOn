@@ -1,0 +1,195 @@
+---
+name: hormozi-gtm
+version: 1.0.0
+domain: business-strategy
+description: Hormozi GTM Protocol — High-Ticket Positioning, Value Ladder Architecture, and Outcome-First Copy
+author: ArkOn Architect
+tags: [gtm, pricing, value-ladder, copywriting, positioning, high-ticket]
+---
+
+# 💰 Hormozi GTM Protocol
+
+## Purpose
+Apply Alex Hormozi's "Grand Slam Offer" framework to all ArkOn products and client deliverables. Every offer must be so valuable that prospects feel stupid saying no.
+
+---
+
+## 🏗️ Value Ladder Architecture
+
+### Tier Structure
+```
+┌─────────────────────────────────────────────────┐
+│  TIER 4: SOVEREIGN PARTNERSHIP                  │
+│  Price: $25,000–$100,000+/mo                    │
+│  Delivery: Embedded AI workforce + strategy     │
+│  Access: Direct architect line, priority SLA     │
+├─────────────────────────────────────────────────┤
+│  TIER 3: IMPLEMENTATION                         │
+│  Price: $5,000–$25,000                          │
+│  Delivery: Full system build + 90-day support   │
+│  Access: Weekly strategy calls                  │
+├─────────────────────────────────────────────────┤
+│  TIER 2: STRATEGY SESSION                       │
+│  Price: $500–$2,500                             │
+│  Delivery: 90-min deep-dive + action plan       │
+│  Access: Recording + 7-day follow-up            │
+├─────────────────────────────────────────────────┤
+│  TIER 1: ENTRY ASSET                            │
+│  Price: Free–$97                                │
+│  Delivery: Lead magnet / mini-tool / audit      │
+│  Access: Community + nurture sequence           │
+└─────────────────────────────────────────────────┘
+```
+
+### Value Ladder Rules
+1. Each tier must deliver 10x the price in perceived value
+2. Ascending tiers solve progressively deeper problems
+3. Never sell implementation without strategy qualification first
+4. Free tier must demonstrate competence that makes paid inevitable
+5. Price anchoring: always show highest tier first in proposals
+
+---
+
+## 📝 Outcome-First Copy Formulas
+
+### The Grand Slam Offer Formula
+```
+[Dream Outcome] + [Perceived Likelihood of Achievement]
+─────────────────────────────────────────────────────────
+[Time Delay] + [Effort & Sacrifice]
+```
+
+**Maximize numerator. Minimize denominator.**
+
+### Headline Templates
+
+#### Pattern 1: Outcome + Timeframe + Without
+```
+"Get [SPECIFIC OUTCOME] in [TIMEFRAME] without [MAIN OBJECTION]"
+
+Example: "Get 40+ qualified leads per month in 60 days without spending a dollar on ads"
+```
+
+#### Pattern 2: How [AVATAR] Gets [RESULT]
+```
+"How [SPECIFIC AVATAR] [ACHIEVES OUTCOME] (even if [OBJECTION])"
+
+Example: "How MedSpa owners fill their calendar with $3K+ procedures (even if they've never done digital marketing)"
+```
+
+#### Pattern 3: The Irresistible Stack
+```
+"You get [CORE OFFER] ($X value)
++ [BONUS 1] ($X value)
++ [BONUS 2] ($X value)
++ [BONUS 3] ($X value)
+= Total Value: $XX,XXX
+Your Investment: $X,XXX"
+```
+
+#### Pattern 4: Risk Reversal Close
+```
+"If [SPECIFIC MEASURABLE RESULT] doesn't happen in [TIMEFRAME], 
+[GUARANTEE: full refund / work free until it does / pay double]"
+```
+
+### Body Copy Framework (PAS + Stack)
+
+```markdown
+## [Pain Agitation]
+You're spending $X,000/month on [ineffective thing]...
+Your team wastes [X hours/week] on [manual process]...
+Meanwhile your competitors are [doing the thing you should be doing]...
+
+## [Solution Introduction]
+What if you could [dream outcome] without [sacrifice]?
+
+## [Mechanism — Why This Works]
+Unlike [commodity alternative], [your mechanism] works because:
+1. [Unique differentiator 1]
+2. [Unique differentiator 2]  
+3. [Unique differentiator 3]
+
+## [Proof]
+- [Client result with specific numbers]
+- [Client result with specific numbers]
+- [Client result with specific numbers]
+
+## [Offer Stack]
+Here's everything you get:
+✅ [Deliverable 1] — Value: $X,XXX
+✅ [Deliverable 2] — Value: $X,XXX
+✅ [Deliverable 3] — Value: $X,XXX
+✅ [Bonus] — Value: $X,XXX
+📊 Total Value: $XX,XXX
+💰 Your Investment: $X,XXX
+
+## [Guarantee + CTA]
+[Risk reversal statement]
+[Clear single next step]
+```
+
+---
+
+## 💎 Pricing Standards
+
+### Pricing Rules
+1. **Never compete on price** — compete on value delivered
+2. **Price = Transformation value × 10-20% capture** — if you save them $100K, charge $10-20K
+3. **Monthly recurring > One-time** — build revenue compounding
+4. **Always include implementation** — strategy without execution = zero value
+5. **Name your price with confidence** — no "starting at" or "as low as"
+
+### Price Anchoring Playbook
+| If You Want to Sell | Anchor Against | Ratio |
+|---|---|---|
+| $2,500 strategy session | $25,000 full implementation | 10:1 |
+| $10,000 build | $100,000 enterprise equivalent | 10:1 |
+| $500/mo retainer | $8,000/mo agency alternative | 16:1 |
+| Free lead magnet | $500 strategy session | ∞:1 |
+
+### Proposal Structure
+1. Restate their problem (prove you listened)
+2. Paint the dream outcome (specific numbers)
+3. Show the gap (current state → desired state)
+4. Present mechanism (why your approach works)
+5. Stack the value (itemized with dollar amounts)
+6. State the investment (single clear number)
+7. Reverse the risk (guarantee)
+8. Give one CTA (book call / sign agreement / pay invoice)
+
+---
+
+## 🎯 Qualification Framework
+
+### Ideal Client Profile (ICP) Criteria
+- Revenue: $500K–$10M annually
+- Problem awareness: Knows they have the problem
+- Budget authority: Decision maker in the room
+- Timeline urgency: Needs results in <90 days
+- Sophistication: Tried other solutions (and failed)
+
+### Disqualification Signals
+- "What's your cheapest option?"
+- "Can you match [commodity competitor]'s price?"
+- "We don't really have a budget for this"
+- "Let me check with my partner/team" (without timeline)
+- "Can you just do [tiny piece] for now?"
+
+---
+
+## 🚫 Anti-Patterns (Never Do)
+
+1. Hourly billing — sells time not outcomes
+2. Discounting without removing scope — trains buyers to negotiate
+3. Listing features without outcomes — nobody buys features
+4. Vague deliverables — "we'll optimize your marketing" means nothing
+5. Multiple CTAs — one offer, one action, one deadline
+6. Selling to unqualified prospects — wastes everyone's time
+7. Comparing to competitors — positions you as commodity
+
+---
+
+## 🔧 Integration Notes
+
+Apply this protocol when: writing proposals, creating landing pages, pricing new offerings, structuring sales calls, building lead magnets, or designing onboarding sequences.

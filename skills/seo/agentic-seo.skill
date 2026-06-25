@@ -1,0 +1,353 @@
+---
+name: agentic-seo
+version: 1.0.0
+domain: seo-automation
+description: Agentic SEO Protocol — JSON-LD Structured Data, Machine Readability, and AI-First Content Optimization
+author: ArkOn Architect
+tags: [seo, json-ld, schema, structured-data, ai-optimization, medspa, local-seo]
+---
+
+# 🤖 Agentic SEO Protocol
+
+## Purpose
+Optimize digital properties for AI agent discovery — not just Google crawlers. As LLMs, voice assistants, and autonomous agents become primary information retrievers, structured data and machine-readable content become the #1 ranking factor.
+
+---
+
+## 📋 JSON-LD Template Library
+
+### Template 1: Local Business (MedSpa)
+```json
+{
+  "@context": "https://schema.org",
+  "@type": "MedicalBusiness",
+  "@id": "https://[domain].com/#business",
+  "name": "[Business Name]",
+  "description": "[80-160 char description with primary keyword]",
+  "url": "https://[domain].com",
+  "telephone": "+1-[XXX]-[XXX]-[XXXX]",
+  "email": "info@[domain].com",
+  "image": "https://[domain].com/images/storefront.jpg",
+  "logo": "https://[domain].com/images/logo.png",
+  "priceRange": "$$$",
+  "address": {
+    "@type": "PostalAddress",
+    "streetAddress": "[Street]",
+    "addressLocality": "[City]",
+    "addressRegion": "[State]",
+    "postalCode": "[ZIP]",
+    "addressCountry": "US"
+  },
+  "geo": {
+    "@type": "GeoCoordinates",
+    "latitude": "[LAT]",
+    "longitude": "[LNG]"
+  },
+  "openingHoursSpecification": [
+    {
+      "@type": "OpeningHoursSpecification",
+      "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+      "opens": "09:00",
+      "closes": "18:00"
+    }
+  ],
+  "aggregateRating": {
+    "@type": "AggregateRating",
+    "ratingValue": "[X.X]",
+    "reviewCount": "[XXX]",
+    "bestRating": "5"
+  },
+  "hasOfferCatalog": {
+    "@type": "OfferCatalog",
+    "name": "Treatments & Services",
+    "itemListElement": [
+      {
+        "@type": "Offer",
+        "itemOffered": {
+          "@type": "MedicalProcedure",
+          "name": "[Treatment Name]",
+          "description": "[Treatment description]",
+          "howPerformed": "[Brief procedure description]"
+        }
+      }
+    ]
+  },
+  "sameAs": [
+    "https://www.facebook.com/[page]",
+    "https://www.instagram.com/[handle]",
+    "https://www.yelp.com/biz/[slug]"
+  ]
+}
+```
+
+### Template 2: Service/Product Offer
+```json
+{
+  "@context": "https://schema.org",
+  "@type": "Service",
+  "@id": "https://[domain].com/services/[slug]#service",
+  "name": "[Service Name]",
+  "description": "[Outcome-focused description, 100-200 chars]",
+  "provider": {
+    "@type": "Organization",
+    "@id": "https://[domain].com/#business"
+  },
+  "serviceType": "[Category]",
+  "areaServed": {
+    "@type": "City",
+    "name": "[City, State]"
+  },
+  "hasOfferCatalog": {
+    "@type": "OfferCatalog",
+    "name": "[Service] Packages",
+    "itemListElement": [
+      {
+        "@type": "Offer",
+        "name": "[Package Name]",
+        "price": "[XXXX]",
+        "priceCurrency": "USD",
+        "description": "[What's included]",
+        "validFrom": "[YYYY-MM-DD]"
+      }
+    ]
+  },
+  "review": [
+    {
+      "@type": "Review",
+      "author": { "@type": "Person", "name": "[Name]" },
+      "reviewRating": { "@type": "Rating", "ratingValue": "5" },
+      "reviewBody": "[Specific outcome-based testimonial]"
+    }
+  ]
+}
+```
+
+### Template 3: FAQ (AI-Optimized)
+```json
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "[Question that an AI agent would ask]",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "[Concise, factual answer — 1-3 sentences. Include specific numbers, timeframes, and outcomes.]"
+      }
+    }
+  ]
+}
+```
+
+### Template 4: HowTo (Procedure Steps)
+```json
+{
+  "@context": "https://schema.org",
+  "@type": "HowTo",
+  "name": "[How to {achieve outcome}]",
+  "description": "[Brief overview of the process]",
+  "totalTime": "PT[X]M",
+  "estimatedCost": {
+    "@type": "MonetaryAmount",
+    "currency": "USD",
+    "value": "[XXX]"
+  },
+  "step": [
+    {
+      "@type": "HowToStep",
+      "name": "[Step Title]",
+      "text": "[Step description with specific action]",
+      "url": "https://[domain].com/[page]#step1"
+    }
+  ]
+}
+```
+
+### Template 5: Breadcrumb Navigation
+```json
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": "https://[domain].com"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "[Category]",
+      "item": "https://[domain].com/[category]"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "[Current Page]",
+      "item": "https://[domain].com/[category]/[page]"
+    }
+  ]
+}
+```
+
+---
+
+## 🏥 5-Step MedSpa SEO Audit Workflow
+
+### Step 1: Technical Foundation Scan
+```
+CHECKLIST:
+□ robots.txt allows critical paths
+□ XML sitemap submitted and valid
+□ Page speed: LCP < 2.5s, FID < 100ms, CLS < 0.1
+□ Mobile-first responsive design verified
+□ HTTPS with valid certificate
+□ Canonical tags on all pages
+□ No duplicate content / thin pages
+□ Internal linking structure (max 3 clicks to any page)
+□ 404 errors resolved
+□ Structured data validates in Schema.org validator
+
+TOOLS: Google PageSpeed Insights, Screaming Frog, Schema Validator
+OUTPUT: Technical health score (0-100) + priority fix list
+```
+
+### Step 2: Local SEO & GBP Optimization
+```
+CHECKLIST:
+□ Google Business Profile claimed & verified
+□ NAP consistency (Name, Address, Phone) across all directories
+□ Primary category: "Medical Spa" (or most specific available)
+□ Secondary categories added (3-5 relevant)
+□ Business description keyword-optimized (750 chars)
+□ Services listed with descriptions and prices
+□ Photos: 10+ high-quality (storefront, interior, staff, results)
+□ Google Posts: weekly frequency
+□ Q&A section populated (seed 10+ questions)
+□ Review velocity: strategy for 5+ reviews/month
+□ Citation consistency across 40+ directories
+
+TOOLS: BrightLocal, Moz Local, GBP Dashboard
+OUTPUT: Local visibility score + citation gap report
+```
+
+### Step 3: Content & Keyword Architecture
+```
+CHECKLIST:
+□ Treatment pages for every service offered
+□ Location pages for service areas (city + neighborhood)
+□ Blog/resource hub with educational content
+□ Keyword mapping: 1 primary + 2-3 secondary per page
+□ Search intent alignment (informational vs transactional)
+□ Content depth: 1,500+ words on treatment pages
+□ Internal linking between related treatments
+□ Before/after galleries (with alt text)
+□ Video content embedded (consultations, procedures)
+□ FAQ section on every treatment page (feeds FAQ schema)
+
+KEYWORD PRIORITIES:
+- "[Treatment] + [City]" — transactional (highest priority)
+- "[Treatment] cost/price" — transactional
+- "[Treatment] before and after" — consideration
+- "Best [treatment] near me" — transactional
+- "Is [treatment] worth it" — informational
+- "[Treatment] vs [alternative]" — consideration
+
+OUTPUT: Content calendar + keyword gap analysis
+```
+
+### Step 4: AI-Ready Structured Data Deployment
+```
+CHECKLIST:
+□ LocalBusiness/MedicalBusiness schema on homepage
+□ Service schema on each treatment page
+□ FAQPage schema on FAQ sections
+□ Review/AggregateRating schema
+□ Breadcrumb schema on all pages
+□ HowTo schema on procedure pages
+□ Event schema for promotions/specials
+□ Person schema for practitioners (with credentials)
+□ ImageObject schema on before/after galleries
+□ VideoObject schema on embedded videos
+
+VALIDATION:
+- Google Rich Results Test: all schemas pass
+- Schema.org validator: no errors
+- Test with "site:[domain]" — rich snippets appearing?
+- Test in ChatGPT/Perplexity — is business information surfaced?
+
+OUTPUT: Schema deployment report + validation screenshots
+```
+
+### Step 5: Authority & Off-Page Signals
+```
+CHECKLIST:
+□ Backlink profile audit (toxic link disavow)
+□ Local link building: chamber of commerce, local press
+□ Industry directories: RealSelf, Healthgrades, Zocdoc
+□ Content partnerships: local influencers, wellness blogs
+□ Social signals: active profiles linked to site
+□ Brand mentions monitoring
+□ Competitor backlink gap analysis
+□ Digital PR opportunities identified
+□ Patient testimonial acquisition workflow
+□ Monthly reporting cadence established
+
+METRICS TO TRACK:
+- Domain Authority / Domain Rating
+- Referring domains (growth rate)
+- Organic traffic (branded vs non-branded)
+- Local pack rankings (top 3 keywords)
+- Conversion rate: visitor → lead
+- Cost per lead (organic channel)
+- Review velocity and average rating
+- AI citation frequency (Perplexity, ChatGPT mentions)
+
+OUTPUT: Authority building roadmap + 90-day link targets
+```
+
+---
+
+## 🎯 AI-First Content Principles
+
+### Writing for Machines AND Humans
+1. **Lead with facts** — AI extracts structured claims first
+2. **Use specific numbers** — "$3,200 average treatment" not "affordable"
+3. **Answer questions directly** — First sentence = answer, then elaborate
+4. **Structured formatting** — Headers, lists, tables > walls of text
+5. **Entity clarity** — Full name on first reference, consistent throughout
+6. **Temporal markers** — "As of June 2026" helps AI assess freshness
+7. **Source attribution** — Link to studies, certifications, credentials
+8. **Outcome framing** — Results-first language in every description
+
+### Machine-Readable Signals Checklist
+- [ ] Every page has at least ONE JSON-LD schema block
+- [ ] All images have descriptive alt text (not keyword stuffed)
+- [ ] Tables use proper HTML <table> markup
+- [ ] Lists use semantic <ul>/<ol> markup
+- [ ] Headings follow strict hierarchy (H1 → H2 → H3)
+- [ ] Phone numbers use tel: links
+- [ ] Addresses use consistent formatting
+- [ ] Prices displayed in standardized format ($X,XXX)
+- [ ] Hours displayed in ISO 8601 where possible
+
+---
+
+## 🚫 Anti-Patterns (Never Do)
+
+1. Keyword stuffing — AI models penalize unnatural density
+2. Thin content pages — merge or expand below 500 words
+3. Missing schemas — every page needs structured data
+4. Inconsistent NAP — single discrepancy breaks local trust
+5. Ignoring AI citations — monitor Perplexity/ChatGPT mentions
+6. Stock photography without context — reduces E-E-A-T signals
+7. Hidden text/links — instant penalty territory
+8. Duplicate GMB listings — merge or remove
+
+---
+
+## 🔧 Integration Notes
+
+Deploy JSON-LD in the <head> section of each page. For Next.js/React apps, use the `next-seo` package or custom `<Script type="application/ld+json">` components. Validate all schemas before deploying with Google's Rich Results Test.
