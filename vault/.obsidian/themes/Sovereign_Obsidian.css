@@ -1,0 +1,329 @@
+/*
+ * SOVEREIGN OBSIDIAN — Imperial Luxury DNA
+ * Engine: gbrain (Spine)
+ * DNA: Luxury Obsidian (#0a0a0f, Cyan/Purple/Pink)
+ * Protocol: visual-moat-database + sovereign-design-protocol
+ * Border/AnuPpuccin clarity layer
+ */
+
+:root {
+  /* === CORE DNA TOKENS === */
+  --sovereign-bg-primary: #0a0a0f;
+  --sovereign-bg-secondary: #0e0e14;
+  --sovereign-bg-tertiary: #12121a;
+  --sovereign-surface: #161620;
+  --sovereign-surface-hover: #1a1a26;
+  --sovereign-border: #1e1e2e;
+  --sovereign-border-active: #2a2a3e;
+
+  /* === ACCENT TRIAD === */
+  --sovereign-cyan: #00f0ff;
+  --sovereign-cyan-dim: #00b8c9;
+  --sovereign-purple: #a855f7;
+  --sovereign-purple-dim: #7c3aed;
+  --sovereign-pink: #ec4899;
+  --sovereign-pink-dim: #be185d;
+
+  /* === TEXT HIERARCHY === */
+  --sovereign-text-primary: #e8e8f0;
+  --sovereign-text-secondary: #a0a0b8;
+  --sovereign-text-muted: #6b6b80;
+  --sovereign-text-accent: var(--sovereign-cyan);
+
+  /* === GRADIENTS === */
+  --sovereign-gradient-header: linear-gradient(135deg, var(--sovereign-purple) 0%, var(--sovereign-pink) 50%, var(--sovereign-cyan) 100%);
+  --sovereign-gradient-glow: linear-gradient(180deg, rgba(0, 240, 255, 0.08) 0%, rgba(168, 85, 247, 0.04) 100%);
+
+  /* === SPACING & RADIUS (Border Clarity) === */
+  --sovereign-radius-sm: 4px;
+  --sovereign-radius-md: 8px;
+  --sovereign-radius-lg: 12px;
+  --sovereign-spacing-unit: 8px;
+}
+
+/* === THEME APPLICATION === */
+.theme-dark {
+  --background-primary: var(--sovereign-bg-primary);
+  --background-secondary: var(--sovereign-bg-secondary);
+  --background-modifier-border: var(--sovereign-border);
+  --background-modifier-hover: var(--sovereign-surface-hover);
+  --text-normal: var(--sovereign-text-primary);
+  --text-muted: var(--sovereign-text-secondary);
+  --text-faint: var(--sovereign-text-muted);
+  --text-accent: var(--sovereign-cyan);
+  --interactive-accent: var(--sovereign-purple);
+  --interactive-accent-hover: var(--sovereign-purple-dim);
+}
+
+/* === WORKSPACE BODY === */
+body {
+  --font-text-theme: 'Inter', 'SF Pro Display', -apple-system, sans-serif;
+  --font-monospace-theme: 'JetBrains Mono', 'Fira Code', monospace;
+  font-feature-settings: 'liga' 1, 'calt' 1;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* === HEADER / TITLEBAR === */
+.titlebar {
+  background: var(--sovereign-bg-primary);
+  border-bottom: 1px solid var(--sovereign-border);
+}
+
+.view-header {
+  border-bottom: 1px solid var(--sovereign-border);
+}
+
+/* === SIDEBAR NAVIGATION (AnuPpuccin Clarity) === */
+.nav-file-title,
+.nav-folder-title {
+  border-radius: var(--sovereign-radius-sm);
+  padding: 4px 8px;
+  transition: all 0.15s ease;
+}
+
+.nav-file-title:hover,
+.nav-folder-title:hover {
+  background: var(--sovereign-surface-hover);
+  color: var(--sovereign-cyan);
+}
+
+.nav-file-title.is-active {
+  background: var(--sovereign-surface);
+  border-left: 2px solid var(--sovereign-cyan);
+  color: var(--sovereign-text-primary);
+}
+
+.nav-folder-title {
+  color: var(--sovereign-text-secondary);
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.75em;
+  letter-spacing: 0.05em;
+}
+
+/* === EDITOR PANE === */
+.markdown-source-view,
+.markdown-preview-view {
+  background: var(--sovereign-bg-primary);
+  padding: calc(var(--sovereign-spacing-unit) * 4);
+  max-width: 860px;
+  margin: 0 auto;
+}
+
+/* === HEADINGS (Gradient Accent) === */
+.markdown-preview-view h1,
+.cm-header-1 {
+  background: var(--sovereign-gradient-header);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-weight: 800;
+  font-size: 2em;
+  margin-top: 1.5em;
+  padding-bottom: 0.3em;
+  border-bottom: 1px solid var(--sovereign-border);
+}
+
+.markdown-preview-view h2,
+.cm-header-2 {
+  color: var(--sovereign-cyan);
+  font-weight: 700;
+  font-size: 1.5em;
+  margin-top: 1.2em;
+}
+
+.markdown-preview-view h3,
+.cm-header-3 {
+  color: var(--sovereign-purple);
+  font-weight: 600;
+  font-size: 1.25em;
+}
+
+/* === LINKS === */
+.markdown-preview-view a,
+.cm-url {
+  color: var(--sovereign-cyan);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.2s ease;
+}
+
+.markdown-preview-view a:hover {
+  border-bottom-color: var(--sovereign-cyan);
+}
+
+/* Internal links (wikilinks) */
+.internal-link {
+  color: var(--sovereign-purple) !important;
+  font-weight: 500;
+}
+
+.internal-link:hover {
+  color: var(--sovereign-pink) !important;
+}
+
+/* === CODE BLOCKS === */
+.markdown-preview-view code,
+.cm-inline-code {
+  background: var(--sovereign-surface);
+  border: 1px solid var(--sovereign-border);
+  border-radius: var(--sovereign-radius-sm);
+  padding: 2px 6px;
+  color: var(--sovereign-pink);
+  font-size: 0.9em;
+}
+
+.markdown-preview-view pre {
+  background: var(--sovereign-bg-secondary);
+  border: 1px solid var(--sovereign-border);
+  border-radius: var(--sovereign-radius-md);
+  padding: 16px;
+  overflow-x: auto;
+}
+
+.markdown-preview-view pre code {
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--sovereign-text-primary);
+}
+
+/* === BLOCKQUOTES === */
+.markdown-preview-view blockquote {
+  border-left: 3px solid var(--sovereign-purple);
+  background: var(--sovereign-surface);
+  border-radius: 0 var(--sovereign-radius-sm) var(--sovereign-radius-sm) 0;
+  padding: 12px 16px;
+  color: var(--sovereign-text-secondary);
+}
+
+/* === CALLOUTS === */
+.callout {
+  border-radius: var(--sovereign-radius-md);
+  border: 1px solid var(--sovereign-border);
+  background: var(--sovereign-surface);
+}
+
+.callout-title {
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+/* === TAGS === */
+.tag {
+  background: rgba(168, 85, 247, 0.15);
+  color: var(--sovereign-purple);
+  border-radius: var(--sovereign-radius-sm);
+  padding: 2px 8px;
+  font-size: 0.85em;
+  font-weight: 500;
+}
+
+/* === GRAPH VIEW === */
+.graph-view.color-fill {
+  color: var(--sovereign-cyan);
+}
+
+.graph-view.color-line {
+  color: var(--sovereign-border-active);
+}
+
+.graph-view.color-arrow {
+  color: var(--sovereign-purple);
+}
+
+/* === TABLES (Border Clarity) === */
+.markdown-preview-view table {
+  border-collapse: collapse;
+  width: 100%;
+  border-radius: var(--sovereign-radius-md);
+  overflow: hidden;
+}
+
+.markdown-preview-view th {
+  background: var(--sovereign-surface);
+  color: var(--sovereign-cyan);
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.8em;
+  letter-spacing: 0.05em;
+  padding: 12px 16px;
+  border-bottom: 2px solid var(--sovereign-border-active);
+}
+
+.markdown-preview-view td {
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--sovereign-border);
+}
+
+.markdown-preview-view tr:hover td {
+  background: var(--sovereign-surface-hover);
+}
+
+/* === CHECKBOXES / TASKS === */
+.task-list-item-checkbox {
+  border: 2px solid var(--sovereign-purple);
+  border-radius: 3px;
+}
+
+.task-list-item-checkbox:checked {
+  background: var(--sovereign-purple);
+  border-color: var(--sovereign-purple);
+}
+
+/* === SCROLLBAR === */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--sovereign-bg-primary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--sovereign-border-active);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--sovereign-purple-dim);
+}
+
+/* === STATUS BAR === */
+.status-bar {
+  background: var(--sovereign-bg-secondary);
+  border-top: 1px solid var(--sovereign-border);
+  font-size: 0.75em;
+  color: var(--sovereign-text-muted);
+}
+
+/* === MODAL / POPOVER === */
+.modal-container .modal {
+  background: var(--sovereign-bg-secondary);
+  border: 1px solid var(--sovereign-border);
+  border-radius: var(--sovereign-radius-lg);
+  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.6);
+}
+
+/* === SEARCH === */
+.search-result-file-title {
+  color: var(--sovereign-cyan);
+  font-weight: 600;
+}
+
+.search-result-file-matched-text {
+  color: var(--sovereign-pink);
+}
+
+/* === SOVEREIGN GLOW EFFECTS === */
+.workspace-leaf.mod-active .view-header {
+  border-bottom-color: var(--sovereign-cyan);
+  box-shadow: 0 1px 0 0 rgba(0, 240, 255, 0.3);
+}
+
+/* Subtle ambient glow on focused editor */
+.workspace-leaf.mod-active .markdown-source-view {
+  box-shadow: inset 0 0 80px rgba(0, 240, 255, 0.02);
+}
