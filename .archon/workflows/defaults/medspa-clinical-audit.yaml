@@ -1,0 +1,517 @@
+name: medspa-clinical-audit
+description: |
+  Use when: User wants to run a clinical audit on MedSpa documents — consent forms,
+            intake paperwork, before/after photos, treatment logs, provider credentials,
+            or any artifact that touches PHI.
+  Triggers: "audit this medspa", "clinical audit", "consent form audit", "PHI audit",
+            "HIPAA review", "medspa compliance check", "review patient docs", "audit intake",
+            "verify consent forms", "audit treatment logs".
+  NOT for: General document review, non-clinical MedSpa marketing assets (use archon-assist),
+           patient-facing communications (route to Aurora/Aurora-equivalent for CS review).
+
+  PHI-AWARE DAG workflow that:
+  1. Runs a Guardian pre-flight gate (PHI classification + scope confirmation)
+  2. Routes vision extraction through Ark Vision Worker (Zamba2-VL) for documents/screenshots
+  3. Routes text extraction through deterministic parsers for structured forms
+  4. Auto-redacts PHI before any downstream processing (HIPAA Safe Harbor de-id)
+  5. Maps findings to HIPAA / state medical board / FTC advertising rules
+  6. Generates an audit report with EVIDENCE CHAIN — never raw PHI, always provenance hashes
+  7. MANDATORY Human Review gate before ship (Guardian + Operator dual sign-off)
+  8. Logs to ProofAI-style evidence ledger for chain-of-custody
+
+  CABINET ROUTING (load ark-cabinet-v2 skill):
+  - Guardian (compliance) = primary owner, VETO POWER on any PHI/PII ship
+  - Balthazar (eng) = builds the pipeline + extracts vision
+  - Arkon (CFO) = signs off on compliance-related cost (privacy counsel, breach insurance)
+  - Aurora (CS) = notified on any patient-impacting finding
+
+provider: claude
+model: medium
+
+# PHI is special — never run without explicit confirmation that the operator has authority
+# to process these documents. This workflow is INTERACTIVE by design.
+interactive: true
+
+nodes:
+  # ═══════════════════════════════════════════════════════════════
+  # PHASE 0: GUARDIAN PRE-FLIGHT (PHI classification + scope)
+  # ═══════════════════════════════════════════════════════════════
+
+  - id: guardian-preflight
+    prompt: |
+      You are Guardian, the Risk & Compliance agent of the Ark OS V2.0 cabinet.
+      You have VETO POWER over any ship that touches PHI/PII.
+
+      Before any clinical document is processed, confirm ALL of the following:
+
+      1. **Operator authority** — Does the operator have a documented BAA (Business Associate
+         Agreement) or equivalent with the MedSpa, or is this their own practice?
+      2. **Document scope** — What types of documents are in scope? (consent forms, intake,
+         before/after, treatment logs, provider credentials, billing)
+      3. **Retention policy** — How long will processed records be retained, and where?
+      4. **De-identification target** — HIPAA Safe Harbor (18 identifiers stripped) or
+         Expert Determination? Default: Safe Harbor.
+      5. **Output destination** — Where does the audit report go? Must be access-controlled.
+      6. **Breach notification path** — If PHI is exposed during processing, who is notified?
+
+      If ANY answer is missing or ambiguous: HALT. Do not proceed to extraction.
+      Output a structured preflight result.
+
+      Request: $ARGUMENTS
+    depends_on: []
+    model: medium
+    interactive: true
+    allowed_tools: [Read, Glob]
+    output_format:
+      type: object
+      properties:
+        baa_confirmed:
+          type: boolean
+        document_scope:
+          type: array
+          items: { type: string }
+        retention_policy:
+          type: string
+        deidentification_method:
+          type: string
+          enum: ["safe_harbor", "expert_determination"]
+        output_destination:
+          type: string
+        breach_contact:
+          type: string
+        cleared_to_proceed:
+          type: boolean
+        notes:
+          type: string
+      required: [cleared_to_proceed]
+
+  # ═══════════════════════════════════════════════════════════════
+  # PHASE 1: INPUT INTAKE
+  # ═══════════════════════════════════════════════════════════════
+
+  - id: intake-documents
+    prompt: |
+      Identify and classify the clinical documents in scope for this audit.
+
+      For each document, record:
+      - file path or URL
+      - document type (consent_form, intake_questionnaire, before_after_photo, treatment_log,
+        provider_credential, billing_record, lab_result, progress_note, other)
+      - PHI density (none / low / moderate / high)
+      - pages or count
+      - capture date (if visible)
+
+      Output: a structured manifest. Do NOT extract content yet — Guardian has not confirmed scope.
+
+      Request: $ARGUMENTS
+
+      Preflight decision: $guardian-preflight.output
+    depends_on: [guardian-preflight]
+    when: "$guardian-preflight.output.cleared_to_proceed == true"
+    model: small
+
+  - id: validate-manifest
+    bash: |
+      set -e
+      ART_DIR="$ARTIFACTS_DIR"
+      if [ ! -f "$ART_DIR/manifest.json" ]; then
+        echo "ERROR: No manifest produced by intake-documents. Halt." >&2
+        exit 1
+      fi
+      DOC_COUNT=$(python -c "import json,sys; m=json.load(open('$ART_DIR/manifest.json')); print(len(m.get('documents',[])))")
+      if [ "$DOC_COUNT" -eq 0 ]; then
+        echo "ERROR: Empty manifest. Halt." >&2
+        exit 1
+      fi
+      echo "Manifest validated: $DOC_COUNT documents in scope"
+    depends_on: [intake-documents]
+
+  # ═══════════════════════════════════════════════════════════════
+  # PHASE 2: PARALLEL EXTRACTION (vision + text)
+  # ═══════════════════════════════════════════════════════════════
+
+  # Vision path — runs Ark Vision Worker (Zamba2-VL) on images/PDFs/screenshots
+  - id: vision-extract
+    command: ark-vision-worker
+    depends_on: [validate-manifest]
+    context: fresh
+    when: "$intake-documents.output.has_visual_documents == true"
+    output_artifact: vision-extraction.json
+
+  # Text path — deterministic parser for structured forms (CSV, HL7, EHR exports)
+  - id: text-extract
+    command: archon-web-research
+    depends_on: [validate-manifest]
+    context: fresh
+    when: "$intake-documents.output.has_structured_text == true"
+    output_artifact: text-extraction.json
+
+  # Wait for both extraction paths before continuing
+  - id: extraction-bridge
+    bash: |
+      set -e
+      ART_DIR="$ARTIFACTS_DIR"
+      MISSING=0
+      if [ "$intake-documents.output.has_visual_documents" = "true" ] && [ ! -f "$ART_DIR/vision-extraction.json" ]; then
+        echo "Missing vision-extraction.json" >&2
+        MISSING=1
+      fi
+      if [ "$intake-documents.output.has_structured_text" = "true" ] && [ ! -f "$ART_DIR/text-extraction.json" ]; then
+        echo "Missing text-extraction.json" >&2
+        MISSING=1
+      fi
+      if [ "$MISSING" = "1" ]; then
+        echo "Extraction incomplete. Halt." >&2
+        exit 1
+      fi
+      echo "Extraction complete: all paths converged"
+    depends_on: [vision-extract, text-extract]
+
+  # ═══════════════════════════════════════════════════════════════
+  # PHASE 3: PHI REDACTION (HIPAA Safe Harbor)
+  # ═══════════════════════════════════════════════════════════════
+
+  - id: redact-phi
+    prompt: |
+      You are Guardian running the de-identification pass.
+
+      HIPAA Safe Harbor (45 CFR 164.514(b)(2)) — strip these 18 identifiers:
+      1. Names
+      2. Geographic subdivisions smaller than state (street, city, county, precinct, zip,
+         geocodes — EXCEPT first 3 zip digits if pop>20K)
+      3. All elements of dates (except year) — DOB, admission, discharge, death; ages >89
+      4. Telephone numbers
+      5. Fax numbers
+      6. Email addresses
+      7. Social security numbers
+      8. Medical record numbers
+      9. Health plan beneficiary numbers
+      10. Account numbers
+      11. Certificate / license numbers
+      12. Vehicle identifiers
+      13. Device identifiers
+      14. URLs
+      15. IP addresses
+      16. Biometric identifiers (finger/voice prints)
+      17. Full-face photos (and any comparable images)
+      18. Any other unique identifying number, characteristic, or code
+
+      PROCESS:
+      - Read $vision-extraction.json (if present) and $text-extraction.json
+      - Replace every PHI instance with the appropriate token: [NAME_001], [DOB_001], etc.
+      - Maintain a SEPARATE redaction map file (NEVER inside the audit report):
+        $ARTIFACTS_DIR/redaction-map.json — operator-only, never included in shipped output
+      - Compute SHA-256 of original files for provenance chain
+      - Output the redacted extraction as $ARTIFACTS_DIR/redacted-extraction.json
+      - Output a redaction-summary.json: counts per identifier type, files processed, hashes
+
+      CRITICAL: If you cannot confidently redact an identifier (low confidence, edge case),
+      route the field to human review — do not silently pass through.
+    depends_on: [extraction-bridge]
+    model: medium
+    output_artifacts:
+      - redacted-extraction.json
+      - redaction-summary.json
+
+  - id: validate-redaction
+    bash: |
+      # Deterministic redaction completeness check — look for obvious PHI patterns
+      # in the redacted output. This is a belt-and-suspenders check; Guardian's pass
+      # is the primary.
+      set -e
+      ART_DIR="$ARTIFACTS_DIR"
+      if [ ! -f "$ART_DIR/redacted-extraction.json" ]; then
+        echo "ERROR: No redacted extraction. Halt." >&2
+        exit 1
+      fi
+
+      python - <<'PY'
+      import json, re, sys
+
+      RED = json.load(open(r"$ART_DIR/redacted-extraction.json"))
+
+      # Patterns for common PHI that should NEVER appear after redaction
+      FORBIDDEN = [
+          (r'\d{3}-\d{2}-\d{4}', 'SSN'),
+          (r'\d{16}', 'Credit-card-shaped 16-digit'),
+          (r'[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}', 'Email'),
+          (r'\(\d{3}\)\s?\d{3}-\d{4}', 'US phone'),
+          (r'\d{1,2}/\d{1,2}/\d{2,4}', 'Date'),
+      ]
+      hits = []
+      def walk(obj, path=""):
+          if isinstance(obj, dict):
+              for k, v in obj.items():
+                  walk(v, f"{path}.{k}")
+          elif isinstance(obj, list):
+              for i, v in enumerate(obj):
+                  walk(v, f"{path}[{i}]")
+          elif isinstance(obj, str):
+              for pat, label in FORBIDDEN:
+                  if re.search(pat, obj):
+                      hits.append((path, label, obj[:80]))
+
+      walk(RED)
+      if hits:
+          print(f"REDACTION FAIL: {len(hits)} potential PHI hits found in redacted output:")
+          for h in hits[:20]:
+              print(f"  {h[0]}: [{h[1]}] {h[2]!r}")
+          sys.exit(1)
+
+      print(f"Redaction validation PASS: no obvious PHI patterns in redacted output")
+      PY
+    depends_on: [redact-phi]
+
+  # ═══════════════════════════════════════════════════════════════
+  # PHASE 4: COMPLIANCE MAPPING
+  # ═══════════════════════════════════════════════════════════════
+
+  - id: map-hipaa
+    prompt: |
+      Using the redacted extraction, evaluate against HIPAA Privacy Rule (45 CFR Part 164)
+      and Security Rule. Specifically check:
+
+      **Privacy Rule**
+      - Notice of Privacy Practices (NPP) present and current
+      - Authorization for disclosures present (where required)
+      - Minimum necessary standard applied to disclosures
+      - Patient right of access honored (45 CFR 164.524)
+      - Patient right to amendment honored (45 CFR 164.526)
+
+      **Security Rule**
+      - Risk analysis present (45 CFR 164.308(a)(1)(ii)(A))
+      - Workforce training documented (45 CFR 164.308(a)(5))
+      - Access controls in place (45 CFR 164.308(a)(4))
+      - Audit logging enabled (45 CFR 164.312(b))
+      - Encryption at rest and in transit (45 CFR 164.312(a)(2)(iv) + (e)(2)(ii))
+
+      For each control: COMPLIANT / NON-COMPLIANT / NOT-APPLICABLE + evidence reference
+      (re-points to the redacted extraction by entity ID, never raw PHI).
+
+      Output: hipaa-mapping.json
+    depends_on: [validate-redaction]
+    output_artifact: hipaa-mapping.json
+
+  - id: map-state-board
+    prompt: |
+      Map the redacted findings to the relevant STATE medical board rules for the MedSpa's
+      jurisdiction. Default scope: the most common MedSpa states (CA, FL, TX, NY, IL, AZ).
+      If the operator specifies a state, use that.
+
+      Per state, check (general categories — actual rules vary):
+      - Supervision requirements (physician oversight of NPs/PAs/RNs performing procedures)
+      - Delegation of services agreements on file
+      - Informed consent requirements (procedures requiring specific consent language)
+      - Before/after photo retention and patient authorization
+      - Provider credentialing (medical license, DEA, board certification)
+      - Advertising rules (FTC + state — no "guaranteed" results, no misleading claims)
+
+      Output: state-board-mapping.json — control-by-control, NEVER raw PHI.
+    depends_on: [validate-redaction]
+    output_artifact: state-board-mapping.json
+
+  - id: map-ftc-advertising
+    prompt: |
+      If the MedSpa's marketing assets are in scope (website copy, social, before/after
+      galleries), check FTC Act Section 5 + FTC美容広告ガイド for:
+
+      - Before/after photos with comparable lighting, pose, no retouching beyond what's disclosed
+      - Disclaimers for "results may vary"
+      - No unsubstantiated efficacy claims
+      - No "guaranteed" outcome language
+      - Testimonials with required disclosures (typical-results disclosure)
+
+      Output: ftc-advertising-mapping.json
+    depends_on: [validate-redaction]
+    when: "$intake-documents.output.has_marketing_assets == true"
+    output_artifact: ftc-advertising-mapping.json
+
+  # ═══════════════════════════════════════════════════════════════
+  # PHASE 5: PROVENANCE LEDGER (ProofAI-style evidence chain)
+  # ═══════════════════════════════════════════════════════════════
+
+  - id: build-evidence-ledger
+    bash: |
+      set -e
+      ART_DIR="$ARTIFACTS_DIR"
+      python - <<'PY'
+      import json, hashlib, datetime, os, sys
+
+      def sha256_file(p):
+          h = hashlib.sha256()
+          with open(p, 'rb') as f:
+              for chunk in iter(lambda: f.read(8192), b''):
+                  h.update(chunk)
+          return h.hexdigest()
+
+      ledger = {
+          "audit_id": hashlib.sha256(
+              (datetime.datetime.utcnow().isoformat() + str(os.getpid())).encode()
+          ).hexdigest()[:16],
+          "created_utc": datetime.datetime.utcnow().isoformat() + "Z",
+          "operator": os.environ.get("OPERATOR_NAME", "unknown"),
+          "documents": [],
+          "extraction_artifacts": {},
+          "compliance_artifacts": {},
+          "chain_of_custody": [],
+      }
+
+      # Walk manifest if present
+      manifest_p = os.path.join(r"$ART_DIR", "manifest.json")
+      if os.path.isfile(manifest_p):
+          m = json.load(open(manifest_p))
+          for d in m.get("documents", []):
+              fp = d.get("file_path") or d.get("path")
+              entry = {
+                  "document_id": d.get("document_id"),
+                  "type": d.get("type"),
+                  "phi_density": d.get("phi_density"),
+                  "sha256": sha256_file(fp) if fp and os.path.isfile(fp) else None,
+                  "source_path": fp,
+              }
+              ledger["documents"].append(entry)
+              ledger["chain_of_custody"].append({
+                  "step": "ingest",
+                  "document_id": entry["document_id"],
+                  "sha256": entry["sha256"],
+                  "ts": datetime.datetime.utcnow().isoformat() + "Z",
+              })
+
+      for art in ["vision-extraction.json", "text-extraction.json",
+                  "redacted-extraction.json", "redaction-summary.json",
+                  "hipaa-mapping.json", "state-board-mapping.json",
+                  "ftc-advertising-mapping.json"]:
+          p = os.path.join(r"$ART_DIR", art)
+          if os.path.isfile(p):
+              ledger["extraction_artifacts" if "extraction" in art or "redact" in art else "compliance_artifacts"][art] = {
+                  "sha256": sha256_file(p),
+                  "size_bytes": os.path.getsize(p),
+                  "ts": datetime.datetime.utcnow().isoformat() + "Z",
+              }
+              ledger["chain_of_custody"].append({
+                  "step": f"produce:{art}",
+                  "sha256": ledger["extraction_artifacts" if "extraction" in art or "redact" in art else "compliance_artifacts"][art]["sha256"],
+                  "ts": datetime.datetime.utcnow().isoformat() + "Z",
+              })
+
+      out = os.path.join(r"$ART_DIR", "evidence-ledger.json")
+      json.dump(ledger, open(out, "w"), indent=2)
+      print(f"Evidence ledger written: {out}")
+      print(f"  audit_id: {ledger['audit_id']}")
+      print(f"  documents: {len(ledger['documents'])}")
+      print(f"  chain steps: {len(ledger['chain_of_custody'])}")
+      PY
+    depends_on: [map-hipaa, map-state-board, map-ftc-advertising]
+    output_artifact: evidence-ledger.json
+
+  # ═══════════════════════════════════════════════════════════════
+  # PHASE 6: REPORT GENERATION
+  # ═══════════════════════════════════════════════════════════════
+
+  - id: generate-report
+    prompt: |
+      Generate the audit report. STRICT RULES:
+
+      1. NEVER include raw PHI. Every reference is to a redaction token ([NAME_001]) or
+         entity ID from redacted-extraction.json.
+      2. NEVER include full SSN, full DOB, full account numbers, full face photos.
+      3. Every finding MUST cite the evidence-ledger.json entry (sha256 of source document)
+         so the operator can verify provenance WITHOUT re-exposing the document.
+      4. Report structure:
+         - Executive summary (1 page, plain language, no PHI)
+         - Scope (document types, count, retention)
+         - HIPAA findings table (control, status, evidence-ref, severity)
+         - State board findings table
+         - FTC advertising findings (if applicable)
+         - Remediation checklist (prioritized by severity)
+         - Sign-off section (Guardian review + Operator review slots)
+
+      Output: audit-report.md and audit-report.pdf (if available)
+    depends_on: [build-evidence-ledger]
+    model: large
+    output_artifacts:
+      - audit-report.md
+
+  # ═══════════════════════════════════════════════════════════════
+  # PHASE 7: GUARDIAN REVIEW GATE (VETO)
+  # ═══════════════════════════════════════════════════════════════
+
+  - id: guardian-review
+    prompt: |
+      You are Guardian running the FINAL pre-ship review. You have VETO POWER.
+
+      Read $ART_DIR/audit-report.md and confirm:
+
+      1. **No PHI leak** — scan the report. Any raw PHI is an automatic fail.
+      2. **Evidence chain intact** — every finding references a real evidence-ledger entry.
+      3. **Redaction map properly isolated** — redaction-map.json exists but is NOT in
+         any artifact directory the operator will ship.
+      4. **Severity ratings defensible** — high/medium/low each have a clear rule.
+      5. **Remediation actionable** — every finding has a concrete remediation step.
+
+      Output: a sign-off OR a veto with specific items to fix.
+    depends_on: [generate-report]
+    model: large
+    interactive: true
+    allowed_tools: [Read]
+    output_format:
+      type: object
+      properties:
+        decision:
+          type: string
+          enum: ["APPROVED", "VETOED"]
+        veto_reasons:
+          type: array
+          items: { type: string }
+        notes:
+          type: string
+      required: [decision]
+
+  - id: gate-on-veto
+    bash: |
+      set -e
+      DECISION=$(python -c "import json; d=json.load(open('$ART_DIR/guardian-review.json')); print(d['decision'])")
+      if [ "$DECISION" != "APPROVED" ]; then
+        REASONS=$(python -c "import json; d=json.load(open('$ART_DIR/guardian-review.json')); print('; '.join(d.get('veto_reasons', [])))")
+        echo "GUARDIAN VETOED the audit report. Halt." >&2
+        echo "Reasons: $REASONS" >&2
+        exit 2
+      fi
+      echo "Guardian APPROVED the audit report"
+    depends_on: [guardian-review]
+
+  # ═══════════════════════════════════════════════════════════════
+  # PHASE 8: OPERATOR FINAL SIGN-OFF + DELIVERY
+  # ═══════════════════════════════════════════════════════════════
+
+  - id: operator-signoff
+    prompt: |
+      The operator must sign off on the audit report before delivery.
+      Present the report and capture signature/acknowledgement.
+    depends_on: [gate-on-veto]
+    interactive: true
+    model: small
+
+  - id: finalize-delivery
+    bash: |
+      set -e
+      ART_DIR="$ARTIFACTS_DIR"
+      OUT_DIR="$ARTIFACTS_DIR/shipped"
+      mkdir -p "$OUT_DIR"
+
+      # Copy shippable artifacts. NEVER include redaction-map.json in shipped output.
+      for f in audit-report.md audit-report.pdf evidence-ledger.json redacted-extraction.json                hipaa-mapping.json state-board-mapping.json ftc-advertising-mapping.json                redaction-summary.json; do
+        if [ -f "$ART_DIR/$f" ]; then
+          cp "$ART_DIR/$f" "$OUT_DIR/$f"
+        fi
+      done
+
+      echo "Final delivery package:"
+      ls -la "$OUT_DIR" | tail -n +2
+      echo ""
+      echo "CRITICAL: redaction-map.json was NOT shipped (operator-only)."
+      echo "  Operator location: $ART_DIR/redaction-map.json"
+    depends_on: [operator-signoff]
+    output_artifacts:
+      - shipped/audit-report.md
+      - shipped/evidence-ledger.json
